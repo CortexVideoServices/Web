@@ -1,4 +1,4 @@
-import { Connection, ConnectionListener, ConnectionSettings } from './Connection';
+import { Connection, ConnectionSettings } from './Connection';
 import { Participant } from './Participant';
 import { Publisher } from './Publisher';
 
@@ -47,7 +47,7 @@ export interface Session {
   /// Disconnects from the sessions server
   disconnect(): Promise<void>;
   /// Adds session listener
-  add(listener: SessionListener): boolean;
+  addListener(listener: SessionListener): boolean;
   /// Removes session listener
-  remove(listener: SessionListener): boolean;
+  removeListener(listener: SessionListener): void;
 }

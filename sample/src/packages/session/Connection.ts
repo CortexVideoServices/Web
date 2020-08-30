@@ -35,7 +35,7 @@ export interface Connection {
   /// Closes and destructs object
   close(): Promise<void>;
   /// Adds connection listener
-  add(listener: ConnectionListener): boolean;
+  addListener(listener: ConnectionListener): boolean;
   /// Removes connection listener
-  remove(listener: ConnectionListener): boolean;
+  removeListener(listener: ConnectionListener): void;
 }
