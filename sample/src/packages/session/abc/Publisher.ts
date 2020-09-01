@@ -1,34 +1,9 @@
-import { makeParticipantID, Participant, ParticipantSettings } from './Participant';
-import { AudioConstraints, VideoConstraints } from './Constraints';
-
-/// Publisher settings interface
-export interface PublisherSettings extends ParticipantSettings {
-  /// Enable/disable audio track or constrains
-  audio: boolean | AudioConstraints;
-  /// Enable/disable video track or constrains
-  video: boolean | VideoConstraints;
-}
-
-/// Publisher listener
-export interface PublisherListener {
-  /// Called when a error occurred
-  onError?(reason: Error): void;
-
-  /// Appeared / Disappeared dialog for requesting access to local media devices (mic, camera)
-  onAccessDialog?(display: boolean): void;
-
-  /// Called when a participant's stream has been created
-  onStreamCreated?(participant: Participant): void;
-
-  /// Called before a participant's stream is destroyed
-  onStreamDestroy?(participant: Participant): void;
-
-  /// Called before a publisher is destroyed
-  onClosed?(): void;
-}
+import { makeParticipantID, Participant } from '../types/Participant';
+import { AudioConstraints, VideoConstraints } from '../types/Constraints';
+import { PublisherListener, PublisherSettings } from '../types/Publisher';
 
 /// Local stream publisher
-export class Publisher implements Participant {
+export default class Publisher implements Participant {
   /// Participant ID
   readonly id: string = makeParticipantID();
   /// Participant name
@@ -52,9 +27,9 @@ export class Publisher implements Participant {
   }
 
   /// Enable/disable audio track or constrains
-  audio: boolean | AudioConstraints;
+  audio: boolean | AudioConstraints = new AudioConstraints();
   /// Enable/disable video track or constrains
-  video: boolean | VideoConstraints;
+  video: boolean | VideoConstraints = new VideoConstraints();
 
   /// List of camera devices [[id, label]]
   get cameraList(): Array<[string, string]> {
@@ -66,17 +41,12 @@ export class Publisher implements Participant {
   private listeners = new Set<PublisherListener>();
   private emitError = (reason: Error) => this.listeners.forEach((listener) => listener.onError?.call(this, reason));
 
-  constructor(
-    settings: PublisherSettings,
-    audio: boolean | MediaTrackConstraints = true,
-    video: boolean | MediaTrackConstraints = true,
-    listener?: PublisherListener
-  ) {
+  constructor(settings: PublisherSettings, listener?: PublisherListener) {
     this.settings = settings;
     this.name = settings.participantName || null;
     if (listener) this.addListener(listener);
-    this.audio = audio instanceof AudioConstraints ? audio : audio ? new AudioConstraints() : false;
-    this.video = audio instanceof VideoConstraints ? audio : audio ? new VideoConstraints() : false;
+    this.audio = settings.audio instanceof AudioConstraints ? settings.audio : settings.audio ? this.audio : false;
+    this.video = settings.video instanceof VideoConstraints ? settings.video : settings.video ? this.video : false;
   }
 
   /// Starts media stream capturer

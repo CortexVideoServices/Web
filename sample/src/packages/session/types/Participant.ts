@@ -1,3 +1,5 @@
+import { AudioConstraints, VideoConstraints } from './Constraints';
+
 /// Participant interface
 export interface Participant {
   /// ID
@@ -16,10 +18,10 @@ export interface ParticipantSettings {
   readonly participantName?: string;
   /// RTC configuration
   readonly rtcConfiguration: RTCConfiguration;
-  /// Audio constraints
-  readonly audio: boolean | MediaTrackConstraints;
-  /// Video constraints
-  readonly video: boolean | MediaTrackConstraints;
+  /// Enable/disable audio track or constrains
+  readonly audio: boolean | AudioConstraints;
+  /// Enable/disable video track or constrains
+  readonly video: boolean | VideoConstraints;
   /// Debug mode flag
   readonly debug: boolean;
 }
