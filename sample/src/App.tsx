@@ -4,7 +4,11 @@ import LocalStream from '@cvs/react/LocalStream';
 import Session from '@cvs/react/Session';
 import SessionBuilder from '@cvs/session/SessionBuilder';
 
-const sessionBuilder = new SessionBuilder('http://localhost', '01234AB');
+let { protocol, hostname, port } = window.location;
+protocol = protocol === 'http:' ? 'ws' : 'wss';
+port = hostname === 'localhost' ? '8188' : port;
+const serverUrl = `${protocol}://${hostname}:${port}/janus-ws`;
+const sessionBuilder = new SessionBuilder(serverUrl, '01234AB');
 
 export default function () {
   return (

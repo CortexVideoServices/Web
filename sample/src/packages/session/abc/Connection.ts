@@ -34,4 +34,12 @@ export default abstract class Connection {
   removeListener(listener: ConnectionListener): void {
     this.listeners.delete(listener);
   }
+
+  protected emitConnected = () => this.listeners.forEach((listener) => listener.onConnected?.call(this));
+  protected emitDisconnected = () => this.listeners.forEach((listener) => listener.onDisconnected?.call(this));
+
+  protected emitError(reason: Error, andThrow: boolean = false) {
+    this.listeners.forEach((listener) => listener.onError?.call(this, reason));
+    if (andThrow) throw reason;
+  }
 }

@@ -43,7 +43,7 @@ export default abstract class Session {
     onError: (reason: Error) => this.listeners.forEach((listener) => listener.onConnectionError?.call(this, reason)),
   };
 
-  private emitError(reason: Error, andThrow: boolean = false) {
+  protected emitError(reason: Error, andThrow: boolean = false) {
     this.listeners.forEach((listener) => listener.onError?.call(this, reason));
     if (andThrow) throw reason;
   }
@@ -87,12 +87,8 @@ export default abstract class Session {
   }
 
   /// Disconnects from the sessions server
-  async disconnect(): Promise<void> {
-    try {
-      await this.connection.close();
-    } catch (reason) {
-      this.emitError(reason, true);
-    }
+  disconnect(): void {
+    this.connection.close().catch(this.emitError);
   }
 
   private listeners = new Set<SessionListener>();

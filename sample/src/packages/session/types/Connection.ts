@@ -1,3 +1,8 @@
+import { CVSError } from './types';
+
+/// Package base error
+export class ConnectionError extends CVSError {}
+
 /// Connection state enumerator
 export enum ConnectionState {
   Closed,

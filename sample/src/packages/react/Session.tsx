@@ -14,5 +14,9 @@ export const SessionContext = React.createContext<Session | void>(undefined);
 /// Component initializes the session and sets its context for children.
 export default function ({ sessionBuilder, eventHandlers, children }: PropsWithChildren<Props>) {
   const session = sessionBuilder.build(eventHandlers);
+  React.useEffect(() => {
+    session.connect().catch(console.error);
+    return () => session.disconnect();
+  });
   return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
 }
