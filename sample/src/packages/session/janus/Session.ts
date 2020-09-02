@@ -1,27 +1,24 @@
 import Session from '../abc/Session';
-import Connection from './Connection';
 import Publisher from '../abc/Publisher';
 import JanusConnection from './Connection';
-import { ConnectionListener, ConnectionState } from '../types/Connection';
-import { SessionSettings } from '../types/Session';
+import { ConnectionState } from '../types/Connection';
+import { SessionListener, SessionSettings } from '../types/Session';
 
 /// Janus implementation on session
 export default class extends Session {
-  private _connection: JanusConnection;
-  /// Connection to the Janus server
-  get connection(): Connection {
-    return this._connection;
-  }
+  private _janus: JanusConnection;
 
-  constructor(settings: SessionSettings, listener?: ConnectionListener) {
+  constructor(settings: SessionSettings, listener?: SessionListener) {
     super(settings, listener);
-    this._connection = new JanusConnection(settings);
+    this._janus = new JanusConnection(settings);
   }
 
   /// Renews connection
-  protected renewConnection(): void {
-    if (this.connection.state !== ConnectionState.Closed)
+  protected createConection(): JanusConnection {
+    if (this.connection && this.connection.state !== ConnectionState.Closed)
       throw new Error('Previous connection is not close, but request renew');
+    this._janus = new JanusConnection(this.settings);
+    return this._janus;
   }
 
   /// Starts publishing

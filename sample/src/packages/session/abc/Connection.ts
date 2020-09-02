@@ -3,7 +3,10 @@ import { ConnectionListener, ConnectionSettings, ConnectionState } from '../type
 /// Connection abstract base class
 export default abstract class Connection {
   /// Connection state
-  abstract readonly state: ConnectionState;
+  get state(): ConnectionState {
+    return this.getConnectionState();
+  }
+  protected abstract getConnectionState(): ConnectionState;
 
   /// Connection settings
   readonly settings: ConnectionSettings;

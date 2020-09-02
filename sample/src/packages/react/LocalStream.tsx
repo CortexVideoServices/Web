@@ -6,7 +6,7 @@ interface Props extends HTMLProps<HTMLVideoElement> {}
 
 export default function (props: Props) {
   const publisher = React.useContext(PublisherContext);
-  if (!publisher) throw new Error('LocalParticipant must be used with the publisher or in the context of a publisher');
+  if (!publisher) throw new Error('LocalParticipant must be used in the publisher context');
 
   const [stream, setStream] = React.useState<MediaStream | null>(null);
   React.useEffect(() => {

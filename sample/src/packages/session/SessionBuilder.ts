@@ -2,7 +2,7 @@ import Session from './janus/Session';
 import { SessionListener, SessionSettings } from './types/Session';
 
 /// Builder for session object
-export class SessionBuilder implements SessionSettings {
+export default class SessionBuilder implements SessionSettings {
   /// URL for connection to the sessions server
   serverUrl: string;
   /// SessionImpl ID
@@ -14,6 +14,7 @@ export class SessionBuilder implements SessionSettings {
 
   constructor(serverUrl: string, sessionId: string) {
     this.serverUrl = serverUrl;
+    this.sessionId = sessionId;
     this.rtcConfiguration = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -26,8 +27,7 @@ export class SessionBuilder implements SessionSettings {
   }
 
   /// Creates session
-  build(sessionId: string, listener?: SessionListener): Session {
-    this.sessionId = sessionId;
+  build(listener?: SessionListener): Session {
     return new Session(this, listener);
   }
 }

@@ -4,8 +4,8 @@ import { ConnectionState } from '../types/Connection';
 /// Janus implementation of the Connection interface
 export default class extends Connection {
   private _state = ConnectionState.Closed;
-  /// Connection state
-  get state(): ConnectionState {
+  /// Gets connection state
+  protected getConnectionState(): ConnectionState {
     return this._state;
   }
 

@@ -8,8 +8,12 @@ import { ConnectionListener, ConnectionState } from '../types/Connection';
 export default abstract class Session {
   /// Session settings
   readonly settings: SessionSettings;
+
+  private _connection: Connection = this.createConection();
   /// Session connection
-  abstract readonly connection: Connection;
+  get connection(): Connection {
+    return this._connection;
+  }
 
   /// Active remote participants
   get remoteParticipants(): Array<Participant> {
@@ -25,10 +29,10 @@ export default abstract class Session {
   // Stops publishing
   protected abstract async stopPublishing(publisher: Publisher): Promise<void>;
 
-  // Renews connection
-  protected abstract renewConnection(): void;
+  // created connection
+  protected abstract createConection(): Connection;
 
-  constructor(settings: SessionSettings, listener?: SessionListener) {
+  protected constructor(settings: SessionSettings, listener?: SessionListener) {
     this.settings = settings;
     if (listener) this.addListener(listener);
   }
@@ -48,7 +52,7 @@ export default abstract class Session {
   async connect(): Promise<void> {
     if (this.connection.state === ConnectionState.Closed) {
       try {
-        this.renewConnection();
+        this._connection = this.createConection();
         this.connection.addListener(this.connectionListener);
         await this.connection.connect();
       } catch (reason) {
