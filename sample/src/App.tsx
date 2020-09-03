@@ -13,7 +13,7 @@ const sessionBuilder = new SessionBuilder(serverUrl, '01234AB');
 export default function () {
   return (
     <Session sessionBuilder={sessionBuilder}>
-      <Publisher autoPublishing={false}>
+      <Publisher autoPublishing={true}>
         <LocalStream />
       </Publisher>
     </Session>

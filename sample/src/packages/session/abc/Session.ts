@@ -1,6 +1,6 @@
 import Publisher from './Publisher';
 import Connection from './Connection';
-import { Participant } from '../types/Participant';
+import { Stream } from '../types/Participant';
 import { SessionListener, SessionSettings } from '../types/Session';
 import { ConnectionListener, ConnectionState } from '../types/Connection';
 
@@ -9,18 +9,18 @@ export default abstract class Session {
   /// Session settings
   readonly settings: SessionSettings;
 
-  private _connection: Connection = this.createConection();
+  private _connection: Connection = this.createConnection();
   /// Session connection
   get connection(): Connection {
     return this._connection;
   }
 
   /// Active remote participants
-  get remoteParticipants(): Array<Participant> {
+  get remoteParticipants(): Array<Stream> {
     return Array.from(this.remoteParticipantsSet);
   }
 
-  protected remoteParticipantsSet = new Set<Participant>();
+  protected remoteParticipantsSet = new Set<Stream>();
   protected publishersSet = new Set<Publisher>();
 
   // Starts publishing
@@ -30,7 +30,7 @@ export default abstract class Session {
   protected abstract async stopPublishing(publisher: Publisher): Promise<void>;
 
   // created connection
-  protected abstract createConection(): Connection;
+  protected abstract createConnection(): Connection;
 
   protected constructor(settings: SessionSettings, listener?: SessionListener) {
     this.settings = settings;
@@ -40,7 +40,7 @@ export default abstract class Session {
   private connectionListener: ConnectionListener = {
     onConnected: () => this.onConnected(),
     onDisconnected: () => this.onDisconnected(),
-    onError: (reason: Error) => this.listeners.forEach((listener) => listener.onConnectionError?.call(this, reason)),
+    onError: (reason: Error) => this.onError(reason),
   };
 
   protected emitError(reason: Error, andThrow: boolean = false) {
@@ -52,7 +52,7 @@ export default abstract class Session {
   async connect(): Promise<void> {
     if (this.connection.state === ConnectionState.Closed) {
       try {
-        this._connection = this.createConection();
+        this._connection = this.createConnection();
         this.connection.addListener(this.connectionListener);
         await this.connection.connect();
       } catch (reason) {
@@ -88,7 +88,7 @@ export default abstract class Session {
 
   /// Disconnects from the sessions server
   disconnect(): void {
-    this.connection.close().catch(this.emitError);
+    this.connection.close().catch((reason) => this.emitError(reason));
   }
 
   private listeners = new Set<SessionListener>();
@@ -107,12 +107,16 @@ export default abstract class Session {
   // Called when connected
   private onConnected() {
     for (let publisher of this.publishersSet) {
-      this.startPublishing(publisher).catch(this.emitError);
+      this.startPublishing(publisher).catch((reason) => this.emitError(reason));
     }
   }
 
   // Called when disconnected
   private onDisconnected() {
     this.remoteParticipantsSet.clear();
+  }
+
+  private onError(reason: Error) {
+    this.listeners.forEach((listener) => listener.onConnectionError?.call(this, reason));
   }
 }

@@ -106,7 +106,7 @@ export default class extends Connection {
     this._state = ConnectionState.Connected;
     this.keepAlive(57).catch((reason) => {
       this.emitError(reason);
-      this.close().catch(this.emitError);
+      this.close().catch((reason) => this.emitError(reason));
     });
     this.emitConnected();
   }

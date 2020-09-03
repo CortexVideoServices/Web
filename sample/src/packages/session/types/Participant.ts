@@ -1,7 +1,8 @@
 import { AudioConstraints, VideoConstraints } from './Constraints';
+import { randomString } from '../utils';
 
 /// Participant interface
-export interface Participant {
+export interface Stream {
   /// ID
   readonly id: string;
   /// Media stream
@@ -24,18 +25,6 @@ export interface ParticipantSettings {
   readonly video: boolean | VideoConstraints;
   /// Debug mode flag
   readonly debug: boolean;
-}
-
-/// Returns random string
-function randomString(size: number): string {
-  var s = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  return Array(size)
-    .join()
-    .split(',')
-    .map(function () {
-      return s.charAt(Math.floor(Math.random() * s.length));
-    })
-    .join('');
 }
 
 /// Makes participant ID

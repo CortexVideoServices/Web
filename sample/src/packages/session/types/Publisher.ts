@@ -1,4 +1,4 @@
-import { Participant, ParticipantSettings } from './Participant';
+import { Stream, ParticipantSettings } from './Participant';
 
 /// Publisher settings interface
 export interface PublisherSettings extends ParticipantSettings {}
@@ -10,9 +10,9 @@ export interface PublisherListener {
   /// Appeared / Disappeared dialog for requesting access to local media devices (mic, camera)
   onAccessDialog?(display: boolean): void;
   /// Called when a participant's stream has been created
-  onStreamCreated?(participant: Participant): void;
+  onStreamCreated?(participant: Stream): void;
   /// Called before a participant's stream is destroyed
-  onStreamDestroy?(participant: Participant): void;
+  onStreamDestroy?(participant: Stream): void;
   /// Called before a publisher is destroyed
   onClosed?(): void;
 }

@@ -1,21 +1,10 @@
-import { makeParticipantID, Participant } from '../types/Participant';
-import { AudioConstraints, VideoConstraints } from '../types/Constraints';
+import Participant from './Participant';
 import { PublisherListener, PublisherSettings } from '../types/Publisher';
+import { AudioConstraints, VideoConstraints } from '../types/Constraints';
+import { Stream } from '../types/Participant';
 
 /// Local stream publisher
-export default class Publisher implements Participant {
-  /// Participant ID
-  readonly id: string = makeParticipantID();
-  /// Participant name
-  readonly name: string | null;
-
-  private _mediaStream: MediaStream | null = null;
-
-  /// Media stream
-  get mediaStream(): MediaStream | null {
-    return this._mediaStream;
-  }
-
+export default abstract class Publisher extends Participant {
   /// Publisher settings
   readonly settings: PublisherSettings;
 
@@ -39,11 +28,10 @@ export default class Publisher implements Participant {
   private micDevices = new Map<string, string>();
   private cameraDevices = new Map<string, string>();
   private listeners = new Set<PublisherListener>();
-  private emitError = (reason: Error) => this.listeners.forEach((listener) => listener.onError?.call(this, reason));
 
   constructor(settings: PublisherSettings, listener?: PublisherListener) {
+    super(settings.participantName);
     this.settings = settings;
-    this.name = settings.participantName || null;
     if (listener) this.addListener(listener);
     this.audio = settings.audio instanceof AudioConstraints ? settings.audio : settings.audio ? this.audio : false;
     this.video = settings.video instanceof VideoConstraints ? settings.video : settings.video ? this.video : false;
@@ -99,20 +87,16 @@ export default class Publisher implements Participant {
     this.listeners.delete(listener);
   }
 
-  // Sets media stream
-  private setStream(stream: MediaStream | null): void {
-    this.closeStream();
-    this._mediaStream = stream;
-    this.listeners.forEach((listener) => listener.onStreamCreated?.call(this, this));
+  protected emitError(reason: Error): void {
+    this.listeners.forEach((listener) => listener.onError?.call(this, reason));
   }
 
-  // Closes media stream
-  private closeStream() {
-    if (this._mediaStream) {
-      this.listeners.forEach((listener) => listener.onStreamDestroy?.call(this, this));
-      this._mediaStream?.getTracks().forEach((track) => track.stop());
-      this._mediaStream = null;
-    }
+  protected emitStreamCreated(stream: Stream): void {
+    this.listeners.forEach((listener) => listener.onStreamCreated?.call(this, stream));
+  }
+
+  protected emitStreamDestroy(stream: Stream): void {
+    this.listeners.forEach((listener) => listener.onStreamDestroy?.call(this, stream));
   }
 
   // Updates device list

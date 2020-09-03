@@ -1,4 +1,4 @@
-import { CVSError } from './types';
+import { CVSError } from './common';
 
 /// Package base error
 export class ConnectionError extends CVSError {}

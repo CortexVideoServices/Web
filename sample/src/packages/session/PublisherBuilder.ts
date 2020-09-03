@@ -1,5 +1,5 @@
 import Session from './abc/Session';
-import Publisher from './abc/Publisher';
+import Publisher from './janus/Publisher';
 import { PublisherListener, PublisherSettings } from './types/Publisher';
 import { AudioConstraints, VideoConstraints } from './types/Constraints';
 
@@ -32,7 +32,7 @@ export default class PublisherBuilder implements PublisherSettings {
   /// Creates publisher
   build(listener?: PublisherListener, autoPublishing: boolean = false): Publisher {
     const result = new Publisher(this, listener);
-    if (autoPublishing) this.session.publish(result).catch(() => undefined);
+    if (autoPublishing) this.session.publish(result).catch(console.error);
     return result;
   }
 }

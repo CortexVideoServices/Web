@@ -35,9 +35,17 @@ export default abstract class Connection {
     this.listeners.delete(listener);
   }
 
-  protected emitConnected = () => this.listeners.forEach((listener) => listener.onConnected?.call(this));
-  protected emitDisconnected = () => this.listeners.forEach((listener) => listener.onDisconnected?.call(this));
+  /// Emits `Connected` event
+  protected emitConnected() {
+    this.listeners.forEach((listener) => listener.onConnected?.call(this));
+  }
 
+  /// Emits `Disconnected` event
+  protected emitDisconnected() {
+    this.listeners.forEach((listener) => listener.onDisconnected?.call(this));
+  }
+
+  /// Emits `Error` event
   protected emitError(reason: Error, andThrow: boolean = false) {
     this.listeners.forEach((listener) => listener.onError?.call(this, reason));
     if (andThrow) throw reason;

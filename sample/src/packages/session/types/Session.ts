@@ -1,5 +1,5 @@
 import { ConnectionSettings } from './Connection';
-import { Participant } from './Participant';
+import { Stream } from './Participant';
 
 /// Session settings
 export interface SessionSettings extends ConnectionSettings {
@@ -20,11 +20,11 @@ export interface SessionListener {
   /// Called when the session client has disconnected from the session server.
   onDisconnected?(): void;
   /// Called when a local participant's stream has started publishing
-  onStartPublishing?(publisher: Participant): void;
+  onStartPublishing?(publisher: Stream): void;
   /// Called when a local participant's stream has stopped publishing
-  onStopPublishing?(publisher: Participant): void;
+  onStopPublishing?(publisher: Stream): void;
   /// Called when a remote participant's stream has been received
-  onStreamReceived?(remote: Participant): void;
+  onStreamReceived?(remote: Stream): void;
   /// Called when a remote participant's stream has been disappeared
-  onStreamDropped?(remote: Participant): void;
+  onStreamDropped?(remote: Stream): void;
 }

@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import Publisher from '@cvs/session/abc/Publisher';
 import PublisherBuilder from '@cvs/session/PublisherBuilder';
-import { AudioConstraints, VideoConstraints } from '../session/types/Constraints';
+import { AudioConstraints, VideoConstraints } from '@cvs/session/types/Constraints';
 import { PublisherListener } from '@cvs/session/types/Publisher';
 import { SessionContext } from './Session';
 
