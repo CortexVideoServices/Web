@@ -12,7 +12,12 @@ const sessionBuilder = new SessionBuilder(serverUrl, '01234AB');
 
 export default function () {
   return (
-    <Session sessionBuilder={sessionBuilder}>
+    <Session
+      sessionBuilder={sessionBuilder}
+      eventHandlers={{
+        onError: (reason: Error) => console.error('Session error received', reason),
+      }}
+    >
       <Publisher autoPublishing={true}>
         <LocalStream />
       </Publisher>

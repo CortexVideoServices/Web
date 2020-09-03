@@ -25,15 +25,24 @@ export default abstract class Participant implements Stream {
   /// Close and destruct
   abstract async close(): Promise<void>;
 
+  /// Emits `Error` event
   protected abstract emitError(reason: Error): void;
+
+  /// Emits `StreamCreated` event
   protected abstract emitStreamCreated(stream: Stream): void;
+
+  /// Emits `StreamDestroy` event
   protected abstract emitStreamDestroy(stream: Stream): void;
 
   /// Starts peer
-  protected abstract async startPeer(signalConnection: Connection): Promise<void>;
+  protected async startPeer(signalConnection: Connection): Promise<void> {
+    throw new Error('Not yet implemented'); // ToDo: Stop RTC peer
+  }
 
   /// Stop peer
-  protected abstract async stopPeer(signalConnection: Connection): Promise<void>;
+  protected async stopPeer(): Promise<void> {
+    throw new Error('Not yet implemented'); // ToDo: Stop RTC peer
+  }
 
   /// Sets media stream
   protected setStream(stream: MediaStream | null): void {

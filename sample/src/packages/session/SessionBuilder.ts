@@ -6,7 +6,7 @@ export default class SessionBuilder implements SessionSettings {
   /// URL for connection to the sessions server
   serverUrl: string;
   /// SessionImpl ID
-  sessionId: string = '';
+  sessionId: string;
   /// RTC configuration
   rtcConfiguration: RTCConfiguration;
   /// Debug mode flag

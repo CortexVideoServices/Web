@@ -5,6 +5,8 @@ import { AudioConstraints, VideoConstraints } from './types/Constraints';
 
 /// Builder for local stream publisher
 export default class PublisherBuilder implements PublisherSettings {
+  /// Session ID
+  sessionId: string;
   /// Participant name
   participantName?: string;
   /// RTC configuration
@@ -22,6 +24,7 @@ export default class PublisherBuilder implements PublisherSettings {
     audio: boolean | AudioConstraints = true,
     video: boolean | VideoConstraints = true
   ) {
+    this.sessionId = session.settings.sessionId;
     this.participantName = participantName;
     this.rtcConfiguration = session.settings.rtcConfiguration;
     this.debug = session.settings.debug;

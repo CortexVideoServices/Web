@@ -3,7 +3,7 @@ import { Stream } from './Participant';
 
 /// Session settings
 export interface SessionSettings extends ConnectionSettings {
-  /// SessionImpl ID
+  /// Session ID
   readonly sessionId: string;
   /// RTC configuration
   readonly rtcConfiguration: RTCConfiguration;

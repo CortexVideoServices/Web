@@ -1,9 +1,4 @@
-/// Quality enumerator
-export enum Quality {
-  Low = -1,
-  Medium = 0,
-  High = 1,
-}
+import { Quality } from './common';
 
 /// Video constraints
 export class VideoConstraints implements MediaTrackConstraints {

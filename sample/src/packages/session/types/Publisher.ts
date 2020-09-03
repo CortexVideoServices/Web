@@ -1,7 +1,10 @@
 import { Stream, ParticipantSettings } from './Participant';
 
 /// Publisher settings interface
-export interface PublisherSettings extends ParticipantSettings {}
+export interface PublisherSettings extends ParticipantSettings {
+  /// Session ID
+  readonly sessionId: string;
+}
 
 /// Publisher listener
 export interface PublisherListener {

@@ -87,14 +87,17 @@ export default abstract class Publisher extends Participant {
     this.listeners.delete(listener);
   }
 
+  /// Emits `Error` event
   protected emitError(reason: Error): void {
     this.listeners.forEach((listener) => listener.onError?.call(this, reason));
   }
 
+  /// Emits `StreamCreated` event
   protected emitStreamCreated(stream: Stream): void {
     this.listeners.forEach((listener) => listener.onStreamCreated?.call(this, stream));
   }
 
+  /// Emits `StreamDestroy` event
   protected emitStreamDestroy(stream: Stream): void {
     this.listeners.forEach((listener) => listener.onStreamDestroy?.call(this, stream));
   }
