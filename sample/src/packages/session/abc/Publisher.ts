@@ -1,7 +1,6 @@
 import Participant from './Participant';
 import { PublisherListener, PublisherSettings } from '../types/Publisher';
 import { AudioConstraints, VideoConstraints } from '../types/Constraints';
-import { Stream } from '../types/Participant';
 
 /// Local stream publisher
 export default abstract class Publisher extends Participant {
@@ -30,16 +29,22 @@ export default abstract class Publisher extends Participant {
   private listeners = new Set<PublisherListener>();
 
   constructor(settings: PublisherSettings, listener?: PublisherListener) {
-    super(settings.participantName);
+    super(settings);
     this.settings = settings;
     if (listener) this.addListener(listener);
     this.audio = settings.audio instanceof AudioConstraints ? settings.audio : settings.audio ? this.audio : false;
     this.video = settings.video instanceof VideoConstraints ? settings.video : settings.video ? this.video : false;
   }
 
+  /// Emits event `onError`
+  protected emitError(reason: Error, andThrow: boolean = false) {
+    this.listeners.forEach((listener) => listener.onError?.call(this, reason));
+    if (andThrow) throw reason;
+  }
+
   /// Starts media stream capturer
   async startCapturer(): Promise<MediaStream | null> {
-    await this.close();
+    await this.stopCapturer();
     if (!this.cameraDevices.size) await this.updateDeviceList();
     if (!this.audio && !this.video) return null;
     if (!this._accessGranted) this.listeners.forEach((listener) => listener.onAccessDialog?.call(this, true));
@@ -51,12 +56,15 @@ export default abstract class Publisher extends Participant {
       });
       if (stream !== null) {
         this._accessGranted = true;
-        this.setStream(stream);
+        this.streamCreated(stream);
       }
       return stream;
+    } catch (result) {
+      this.emitError(result, true);
     } finally {
       this.listeners.forEach((listener) => listener.onAccessDialog?.call(this, false));
     }
+    return null;
   }
 
   /// Switches camera
@@ -66,13 +74,13 @@ export default abstract class Publisher extends Participant {
 
   /// Stops media stream capturer
   async stopCapturer(): Promise<void> {
-    this.closeStream();
+    this.streamDestroy();
   }
 
   /// Close and destruct
-  async close(): Promise<void> {
-    await this.stopCapturer();
-    this.listeners.forEach((listener) => listener.onClosed?.call(this));
+  async destroy(): Promise<void> {
+    await this.closePeer();
+    this.listeners.forEach((listener) => listener.onDestroy?.call(this));
     this.listeners.clear();
   }
 
@@ -87,19 +95,16 @@ export default abstract class Publisher extends Participant {
     this.listeners.delete(listener);
   }
 
-  /// Emits `Error` event
-  protected emitError(reason: Error): void {
-    this.listeners.forEach((listener) => listener.onError?.call(this, reason));
+  // Stream created
+  protected streamCreated(stream: MediaStream | null) {
+    super.streamCreated(stream);
+    if (this.mediaStream) this.listeners.forEach((listener) => listener.onStreamCreated?.call(this, this));
   }
 
-  /// Emits `StreamCreated` event
-  protected emitStreamCreated(stream: Stream): void {
-    this.listeners.forEach((listener) => listener.onStreamCreated?.call(this, stream));
-  }
-
-  /// Emits `StreamDestroy` event
-  protected emitStreamDestroy(stream: Stream): void {
-    this.listeners.forEach((listener) => listener.onStreamDestroy?.call(this, stream));
+  /// Stream state change to closing
+  protected streamDestroy() {
+    if (this.mediaStream) this.listeners.forEach((listener) => listener.onStreamCreated?.call(this, this));
+    super.streamDestroy();
   }
 
   // Updates device list

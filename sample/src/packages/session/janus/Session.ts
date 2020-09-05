@@ -27,14 +27,14 @@ export default class extends Session {
   /// Starts publishing
   protected async startPublishing(publisher: Publisher): Promise<void> {
     if (publisher instanceof JanusPublisher) {
-      await publisher.startPeer(this.janusConnection);
+      await publisher.startPublishing(this.janusConnection);
     } else throw new CVSError('Incorrect publisher type');
   }
 
   /// Stops publishing
   protected async stopPublishing(publisher: Publisher): Promise<void> {
     if (publisher instanceof JanusPublisher) {
-      await publisher.stopPeer();
+      await publisher.stopPublishing();
     } else throw new CVSError('Incorrect publisher type');
   }
 

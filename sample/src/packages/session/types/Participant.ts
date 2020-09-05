@@ -1,4 +1,3 @@
-import { AudioConstraints, VideoConstraints } from './Constraints';
 import { randomString } from '../utils';
 
 /// Participant interface
@@ -8,9 +7,7 @@ export interface Stream {
   /// Media stream
   readonly mediaStream: MediaStream | null;
   /// Participant name
-  readonly name: string | null;
-  /// Closes and destructs object
-  close(): Promise<void>;
+  readonly name?: string;
 }
 
 /// Participant settings interface
@@ -19,10 +16,6 @@ export interface ParticipantSettings {
   readonly participantName?: string;
   /// RTC configuration
   readonly rtcConfiguration: RTCConfiguration;
-  /// Enable/disable audio track or constrains
-  readonly audio: boolean | AudioConstraints;
-  /// Enable/disable video track or constrains
-  readonly video: boolean | VideoConstraints;
   /// Debug mode flag
   readonly debug: boolean;
 }

@@ -7,8 +7,9 @@ import SessionBuilder from '@cvs/session/SessionBuilder';
 let { protocol, hostname, port } = window.location;
 protocol = protocol === 'http:' ? 'ws' : 'wss';
 port = hostname === 'localhost' ? '8188' : port;
-const serverUrl = `${protocol}://${hostname}:${port}/janus-ws`;
-const sessionBuilder = new SessionBuilder(serverUrl, '01234AB');
+// const serverUrl = `${protocol}://${hostname}:${port}/janus-ws`;
+const serverUrl = 'wss://spellvideo.ru/janus-ws';
+const sessionBuilder = new SessionBuilder(serverUrl, 'TEST07');
 
 export default function () {
   return (

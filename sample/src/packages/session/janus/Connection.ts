@@ -66,7 +66,7 @@ export default class extends Connection {
       if (this.sessionId) message.session_id = this.sessionId;
       this.ws.send(JSON.stringify(message));
       return message.transaction;
-    } else throw new ConnectionError('Try to send message but not connected');
+    } else throw new ConnectionError('Tried to send message but connection absent');
   }
 
   private resultWaiters = new Map<string, [Resolve, Reject, number]>();

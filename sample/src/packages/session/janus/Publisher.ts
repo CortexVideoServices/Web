@@ -1,28 +1,62 @@
+/// Janus implementation of the Publisher
 import Publisher from '../abc/Publisher';
 import JanusConnection from './Connection';
-import JanusPlugin from './Plugin';
 import { ConnectionState } from '../types/Connection';
 import { CVSError } from '../types/common';
-import { JanusError } from './types';
 import { PublisherListener, PublisherSettings } from '../types/Publisher';
+import JanusPlugin from './Plugin';
+import { JanusError } from './types';
 
-/// Janus implementation of the Publisher
 export default class extends Publisher {
-  private privateId: number = 0;
+  ///
   private roomId: number;
-  private plugin?: JanusPlugin;
+  private privateId: number = 0;
+  private janusConnection: JanusConnection | null = null;
+  private plugin = new JanusPlugin('janus.plugin.videoroom');
 
   constructor(settings: PublisherSettings, listener?: PublisherListener) {
     super(settings, listener);
     this.roomId = parseInt(settings.sessionId, 36);
   }
 
-  /// Starts peer
-  async startPeer(janusConnection: JanusConnection): Promise<void> {
+  /// Starts publishing
+  async startPublishing(janusConnection: JanusConnection): Promise<void> {
     if (janusConnection.state !== ConnectionState.Connected)
-      throw new CVSError('Janus connection fail, cannot start peer');
-    this.plugin = new JanusPlugin(janusConnection, 'janus.plugin.videoroom');
-    await this.plugin.attach();
+      throw new CVSError('Janus connection fail, cannot start publishing');
+    this.janusConnection = janusConnection;
+    if (this.mediaStream) await this._startPublishing(this.janusConnection);
+  }
+
+  /// Stops publishing
+  async stopPublishing(): Promise<void> {
+    if (this.mediaStream) await this._stopPublishing();
+    this.janusConnection = null;
+  }
+
+  protected streamCreated(stream: MediaStream | null) {
+    super.streamCreated(stream);
+    if (this.janusConnection && !this.plugin.active) {
+      this._startPublishing(this.janusConnection).catch((reason) => this.emitError(reason));
+    }
+  }
+
+  protected streamDestroy() {
+    if (this.janusConnection && this.plugin.active)
+      this._stopPublishing()
+        .catch((reason) => this.emitError(reason))
+        .finally(() => super.streamDestroy());
+  }
+
+  protected sendTrickleCandidate(candidate: any): void {
+    this.plugin.sendMessage({ janus: 'trickle', candidate }).catch(() => null);
+  }
+
+  protected sendTrickleCompleted(): void {
+    this.plugin.sendMessage({ janus: 'trickle', candidate: { completed: true } }).catch(() => null);
+  }
+
+  async _startPublishing(janusConnection: JanusConnection) {
+    await this.plugin.attach(janusConnection);
     while (true) {
       try {
         const [data] = await this.plugin.sendRequest({
@@ -40,15 +74,18 @@ export default class extends Publisher {
         }
       }
     }
-    await super.startPeer(janusConnection);
-    // ToDo: Start publishing
+    const jsepLocal = await this.createOffer();
+    const [, jsepRemote] = await this.plugin.sendRequest({
+      janus: 'message',
+      body: { request: 'configure', audio: true, video: true, ...(this.name ? { display: this.name } : {}) },
+      jsep: jsepLocal,
+    });
+    await this.applyRemoteDescription(jsepRemote);
   }
 
-  /// Stop peer
-  async stopPeer(): Promise<void> {
-    // ToDo: Stop publishing if has connection
-    await super.stopPeer();
-    await this.plugin?.detach();
-    this.plugin = undefined;
+  async _stopPublishing() {
+    // ToDo: send unpublish message
+    this.closePeer();
+    await this.plugin.detach();
   }
 }
