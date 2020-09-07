@@ -34,3 +34,12 @@ export interface Message extends Data {
   error?: MessageError;
   jsep?: JSep;
 }
+
+/// Feed data
+export interface FeedData extends Data {
+  id: number;
+  display?: string;
+  talking?: boolean;
+  audio_codec?: string;
+  video_codec?: string;
+}

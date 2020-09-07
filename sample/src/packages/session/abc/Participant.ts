@@ -50,9 +50,10 @@ export default abstract class Participant implements Stream {
   protected sendTrickleCompleted(): void {}
 
   private peerConnectedResolver?: (value?: MediaStream | PromiseLike<MediaStream | null> | null | undefined) => void;
-  private async peerConnected(): Promise<MediaStream | null> {
+  protected async peerConnected(): Promise<MediaStream | null> {
     return new Promise<MediaStream | null>((resolve, reject) => {
-      this.peerConnectedResolver = resolve;
+      if (this._mediaStream) resolve(this._mediaStream);
+      else this.peerConnectedResolver = resolve;
     });
   }
 
@@ -95,6 +96,12 @@ export default abstract class Participant implements Stream {
   protected async applyRemoteDescription(data: any): Promise<void> {
     const remoteDesc = new RTCSessionDescription(data);
     await this.peerConnection.setRemoteDescription(remoteDesc);
-    await this.peerConnected();
+  }
+
+  /// Creates and returns answer
+  protected async createAnswer(): Promise<any> {
+    const answer = await this.peerConnection.createAnswer();
+    await this.peerConnection.setLocalDescription(answer);
+    return JSON.parse(JSON.stringify(answer));
   }
 }

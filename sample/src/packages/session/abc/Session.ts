@@ -20,14 +20,31 @@ export default abstract class Session {
     return Array.from(this.remoteParticipantsSet);
   }
 
-  protected remoteParticipantsSet = new Set<Stream>();
-  protected publishersSet = new Set<Publisher>();
+  private publishersSet = new Set<Publisher>();
 
   // Starts publishing
   protected abstract async startPublishing(publisher: Publisher): Promise<void>;
 
   // Stops publishing
   protected abstract async stopPublishing(publisher: Publisher): Promise<void>;
+
+  private remoteParticipantsSet = new Set<Stream>();
+
+  // Emits event `StreamReceived`
+  protected emitStreamReceived(stream: Stream) {
+    if (!this.remoteParticipantsSet.has(stream)) {
+      this.remoteParticipantsSet.add(stream);
+      this.listeners.forEach((listener) => listener.onStreamReceived?.call(this, stream));
+    }
+  }
+
+  // Emits event `StreamDropped`
+  protected emitStreamDropped(stream: Stream) {
+    if (this.remoteParticipantsSet.has(stream)) {
+      this.remoteParticipantsSet.delete(stream);
+      this.listeners.forEach((listener) => listener.onStreamDropped?.call(this, stream));
+    }
+  }
 
   // created connection
   protected abstract createConnection(): Connection;
@@ -113,6 +130,7 @@ export default abstract class Session {
 
   // Called when disconnected
   private onDisconnected() {
+    this.remoteParticipantsSet.forEach((stream) => this.emitStreamDropped(stream));
     this.remoteParticipantsSet.clear();
   }
 

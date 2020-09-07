@@ -124,7 +124,7 @@ export default class extends Connection {
         else waiter[0]([data, message.jsep || null]);
       }
     }
-    if (['ack', 'webrtcup', 'media', 'success'].indexOf(message.janus) < 0) {
+    if (message.janus === 'event') {
       this.onMessageListener?.call(this, message);
     }
   }

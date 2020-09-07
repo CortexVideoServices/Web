@@ -29,8 +29,11 @@ export default class extends Publisher {
 
   /// Stops publishing
   async stopPublishing(): Promise<void> {
-    if (this.mediaStream) await this._stopPublishing();
-    this.janusConnection = null;
+    try {
+      if (this.mediaStream) await this._stopPublishing();
+    } finally {
+      this.janusConnection = null;
+    }
   }
 
   protected streamCreated(stream: MediaStream | null) {
@@ -81,6 +84,7 @@ export default class extends Publisher {
       jsep: jsepLocal,
     });
     await this.applyRemoteDescription(jsepRemote);
+    await this.peerConnected();
   }
 
   async _stopPublishing() {
