@@ -1,10 +1,14 @@
 import React, { HTMLProps } from 'react';
 
 interface Props extends HTMLProps<HTMLVideoElement> {
-  stream: MediaStream | null;
+  stream?: MediaStream | null;
 }
 
-export default function ({ stream, ...props }: Props) {
+/// Stream context
+export const StreamContext = React.createContext<MediaStream | null>(null);
+
+export default function ({ stream = null, ...props }: Props) {
+  if (!stream) stream = React.useContext(StreamContext);
   const videoElement = React.createRef<HTMLVideoElement>();
   React.useEffect(() => {
     if (videoElement.current) videoElement.current.srcObject = stream;

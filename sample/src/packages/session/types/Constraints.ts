@@ -3,7 +3,7 @@ import { Quality } from './common';
 /// Video constraints
 export class VideoConstraints implements MediaTrackConstraints {
   /// Camera device ID
-  readonly deviceId: string;
+  deviceId: string;
   /// Frame rate
   readonly frameRate: object;
   /// Frame width

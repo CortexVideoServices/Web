@@ -14,10 +14,33 @@ export default abstract class Publisher extends Participant {
     return this._accessGranted;
   }
 
+  private _audio: AudioConstraints | boolean = new AudioConstraints();
   /// Enable/disable audio track or constrains
-  audio: boolean | AudioConstraints = new AudioConstraints();
+  get audio(): AudioConstraints | boolean {
+    return this._audio;
+  }
+  set audio(value) {
+    let renew = value !== this._audio;
+    if (value === true) {
+      if (this._audio === false) this._audio = new AudioConstraints();
+      else renew = false;
+    } else this._audio = value;
+    if (renew) this.startCapturer().catch((reason) => this.emitError(reason));
+  }
+
+  private _video: VideoConstraints | boolean = new VideoConstraints();
   /// Enable/disable video track or constrains
-  video: boolean | VideoConstraints = new VideoConstraints();
+  get video(): VideoConstraints | boolean {
+    return this._video;
+  }
+  set video(value) {
+    let renew = value !== this._video;
+    if (value === true) {
+      if (this._video === false) this._video = new VideoConstraints();
+      else renew = false;
+    } else this._video = value;
+    if (renew) this.startCapturer().catch((reason) => this.emitError(reason));
+  }
 
   /// List of camera devices [[id, label]]
   get cameraList(): Array<[string, string]> {
@@ -69,7 +92,25 @@ export default abstract class Publisher extends Participant {
 
   /// Switches camera
   async switchCamera(deviceId?: string): Promise<MediaStream | null> {
-    throw new Error('Not yet implemented');
+    try {
+      if (!deviceId && this.mediaStream && this.cameraDevices.size && this.mediaStream.getVideoTracks().length) {
+        const currentDeviceId = this.mediaStream.getVideoTracks()[0].getCapabilities().deviceId;
+        if (currentDeviceId) {
+          const deviceIds = Array.from(this.cameraDevices.keys());
+          let nextDeviceId = deviceIds[0];
+          const currentDeviceIndex = deviceIds.indexOf(currentDeviceId);
+          if (currentDeviceIndex + 1 < deviceIds.length) nextDeviceId = deviceIds[currentDeviceIndex + 1];
+          if (nextDeviceId) deviceId = nextDeviceId;
+        }
+      }
+      if (deviceId && this._video instanceof VideoConstraints) {
+        this._video.deviceId = deviceId;
+        await this.startCapturer();
+      }
+    } catch (error) {
+      this.emitError(error);
+    }
+    return this.mediaStream;
   }
 
   /// Stops media stream capturer

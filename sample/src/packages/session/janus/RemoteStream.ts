@@ -5,7 +5,6 @@ import JanusConnection from './Connection';
 import JanusPlugin from './Plugin';
 import { ConnectionState } from '../types/Connection';
 import { CVSError } from '../types/common';
-import { Stream } from '../types/Participant';
 
 /// Janus implementation of remote stream (participant)
 export default class RemoteStream extends Participant {

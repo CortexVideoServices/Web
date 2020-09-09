@@ -9,7 +9,7 @@ interface Props {
 }
 
 /// Session context
-export const SessionContext = React.createContext<Session | void>(undefined);
+export const SessionContext = React.createContext<Session | null>(null);
 
 /// Component initializes the session and sets its context for children.
 export default function ({ sessionBuilder, eventHandlers, children }: PropsWithChildren<Props>) {
