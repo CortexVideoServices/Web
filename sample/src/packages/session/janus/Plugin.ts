@@ -30,10 +30,10 @@ export default class {
   /// Detach participant plugin
   async detach(): Promise<void> {
     const connection = this.connection;
-    this.connection = undefined;
     try {
       if (connection && connection.state === ConnectionState.Connected) await this.sendMessage({ janus: 'detach' });
     } finally {
+      this.connection = undefined;
       this.handleId = 0;
     }
   }

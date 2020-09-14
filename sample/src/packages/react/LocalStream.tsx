@@ -2,9 +2,9 @@ import React, { HTMLProps, ReactNode } from 'react';
 import { PublisherContext } from './Publisher';
 import Publisher from '@cvs/session/abc/Publisher';
 import Video, { StreamContext } from './Video';
+import { SwitchTrack } from './Stream';
 
 type SwitchCamera = (deviceId?: string) => void;
-type SwitchTrack = (value: boolean) => void;
 
 interface ChildrenProps {
   stream: MediaStream | null;
@@ -17,13 +17,14 @@ type ReactNodeFactory = (props: ChildrenProps) => ReactNode;
 
 interface Props extends HTMLProps<HTMLVideoElement> {
   publisher?: Publisher | null;
+  //switchCamera?: SwitchCamera;
   children?: ReactNodeFactory | ReactNode;
 }
 
 /// Local stream
 export default function ({ publisher, children, ...props }: Props) {
-  if (!publisher) publisher = React.useContext(PublisherContext);
-  if (!publisher) throw new Error('LocalParticipant must be used within the publisher context');
+  publisher = React.useContext(PublisherContext) || publisher;
+  if (!publisher) throw new Error('LocalStream must be used within the publisher context');
   const nnPublisher = publisher;
   const audio = nnPublisher.audio;
   const video = nnPublisher.video;

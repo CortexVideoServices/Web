@@ -1,9 +1,10 @@
 import * as React from 'react';
-import Publisher from '@cvs/react/Publisher';
-import Session from '@cvs/react/Session';
+import { Route, Switch } from 'react-router-dom';
 import SessionBuilder from '@cvs/session/SessionBuilder';
-import LocalStream from './packages/react/LocalStream';
-import Video from './packages/react/Video';
+import Sample0 from './Sample0';
+import Sample1 from './Sample1';
+import Sample2 from './Sample2';
+import Sample3 from './Sample3';
 
 let { protocol, hostname, port } = window.location;
 protocol = protocol === 'http:' ? 'ws' : 'wss';
@@ -13,19 +14,21 @@ const sessionBuilder = new SessionBuilder(serverUrl, 'TEST07');
 
 export default function () {
   return (
-    <Session
-      sessionBuilder={sessionBuilder}
-      eventHandlers={{
-        onError: (reason: Error) => console.error('Session error received', reason),
-      }}
-    >
-      <Publisher>
-        <LocalStream>
-          {({ stream, switchCamera }) => {
-            return <Video width={320} stream={stream} onClick={() => switchCamera()} />;
-          }}
-        </LocalStream>
-      </Publisher>
-    </Session>
+    <div className="App">
+      <Switch>
+        <Route path="/sample3">
+          <Sample3 sessionBuilder={sessionBuilder} />
+        </Route>
+        <Route path="/sample2">
+          <Sample2 sessionBuilder={sessionBuilder} />
+        </Route>
+        <Route path="/sample1">
+          <Sample1 sessionBuilder={sessionBuilder} />
+        </Route>
+        <Route path="*">
+          <Sample0 sessionBuilder={sessionBuilder} />
+        </Route>
+      </Switch>
+    </div>
   );
 }

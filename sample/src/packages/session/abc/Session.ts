@@ -15,7 +15,7 @@ export default abstract class Session {
     return this._connection;
   }
 
-  /// Active remote participants
+  /// Active remote streams
   get remoteParticipants(): Array<Stream> {
     return Array.from(this.remoteParticipantsSet);
   }

@@ -89,7 +89,7 @@ export default class extends Publisher {
 
   async _stopPublishing() {
     // ToDo: send unpublish message
-    this.closePeer();
     await this.plugin.detach();
+    await this.closePeer();
   }
 }

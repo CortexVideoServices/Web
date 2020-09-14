@@ -8,7 +8,7 @@ interface Props extends HTMLProps<HTMLVideoElement> {
 export const StreamContext = React.createContext<MediaStream | null>(null);
 
 export default function ({ stream = null, ...props }: Props) {
-  if (!stream) stream = React.useContext(StreamContext);
+  stream = React.useContext(StreamContext) || stream;
   const videoElement = React.createRef<HTMLVideoElement>();
   React.useEffect(() => {
     if (videoElement.current) videoElement.current.srcObject = stream;
