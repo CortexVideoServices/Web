@@ -1,4 +1,4 @@
-import { CVSError } from '../types/common';
+import { CVSError } from '../common';
 
 export type Reject = (reason?: any) => void;
 export type Resolve = (value?: [Data, JSep | null] | PromiseLike<[Data, JSep | null]> | undefined) => void;

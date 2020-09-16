@@ -1,9 +1,8 @@
 import React, { HTMLProps, ReactNode } from 'react';
 import { PublisherContext } from './Publisher';
-import Publisher from '@cvs/session/abc/Publisher';
 import Video, { StreamContext } from './Video';
-import { SwitchTrack } from './Stream';
 
+type SwitchTrack = (value: boolean) => void;
 type SwitchCamera = (deviceId?: string) => void;
 
 interface ChildrenProps {
@@ -16,25 +15,22 @@ interface ChildrenProps {
 type ReactNodeFactory = (props: ChildrenProps) => ReactNode;
 
 interface Props extends HTMLProps<HTMLVideoElement> {
-  publisher?: Publisher | null;
-  //switchCamera?: SwitchCamera;
   children?: ReactNodeFactory | ReactNode;
 }
 
 /// Local stream
-export default function ({ publisher, children, ...props }: Props) {
-  publisher = React.useContext(PublisherContext) || publisher;
+export default function ({ children, ...props }: Props) {
+  const publisher = React.useContext(PublisherContext);
   if (!publisher) throw new Error('LocalStream must be used within the publisher context');
-  const nnPublisher = publisher;
-  const audio = nnPublisher.audio;
-  const video = nnPublisher.video;
+  const audio = publisher.audio;
+  const video = publisher.video;
   const [stream, setStream] = React.useState<MediaStream | null>(null);
   React.useEffect(() => {
-    const listener = nnPublisher.addListener({
-      onStreamCreated: () => setStream(nnPublisher.mediaStream),
+    const listener = publisher.addListener({
+      onStreamCreated: () => setStream(publisher.mediaStream),
       onStreamDestroy: () => setStream(null),
     });
-    return () => nnPublisher.removeListener(listener);
+    return () => publisher.removeListener(listener);
   });
   if (children) {
     if (children instanceof Function)
@@ -42,9 +38,9 @@ export default function ({ publisher, children, ...props }: Props) {
         <>
           {children({
             stream,
-            switchCamera: (deviceId) => nnPublisher.switchCamera(deviceId),
-            enableAudio: (value) => (nnPublisher.audio = value ? audio : false),
-            enableVideo: (value) => (nnPublisher.video = value ? video : false),
+            switchCamera: (deviceId) => publisher.switchCamera(deviceId),
+            enableAudio: (value) => publisher.startCapturer(video, value ? audio : false),
+            enableVideo: (value) => publisher.startCapturer(value ? video : false, audio),
           })}
         </>
       );

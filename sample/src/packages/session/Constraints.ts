@@ -15,12 +15,12 @@ export class VideoConstraints implements MediaTrackConstraints {
 
   constructor(
     deviceId: string = 'default',
-    resolution: Quality = Quality.Medium,
-    frameRate: Quality = Quality.Medium,
-    wide: boolean = false
+    readonly resolution: Quality = Quality.Medium,
+    readonly fps: Quality = Quality.Medium,
+    readonly wide: boolean = false
   ) {
     this.deviceId = deviceId;
-    this.frameRate = { max: frameRate.valueOf() >= 0 ? (frameRate.valueOf() > 0 ? 30 : 15) : 7 };
+    this.frameRate = { max: fps.valueOf() >= 0 ? (fps.valueOf() > 0 ? 30 : 15) : 7 };
     let width: number, height: number;
     if (wide) {
       width = resolution.valueOf() >= 0 ? (resolution.valueOf() > 0 ? 1280 : 720) : 352;

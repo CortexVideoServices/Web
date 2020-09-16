@@ -1,7 +1,7 @@
-import Session from './abc/Session';
+import Session from './Session';
 import Publisher from './janus/Publisher';
-import { PublisherListener, PublisherSettings } from './types/Publisher';
-import { AudioConstraints, VideoConstraints } from './types/Constraints';
+import { PublisherListener, PublisherSettings } from './Publisher';
+import { AudioConstraints, VideoConstraints } from './Constraints';
 
 /// Builder for local stream publisher
 export default class PublisherBuilder implements PublisherSettings {
@@ -35,7 +35,7 @@ export default class PublisherBuilder implements PublisherSettings {
   /// Creates publisher
   build(listener?: PublisherListener, autoPublishing: boolean = false): Publisher {
     const result = new Publisher(this, listener);
-    if (autoPublishing) this.session.publish(result).catch(console.error);
+    if (autoPublishing) this.session.addPublisher(result);
     return result;
   }
 }

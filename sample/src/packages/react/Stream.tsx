@@ -1,5 +1,6 @@
+// ToDo: need to be refactored
 import React, { HTMLProps, ReactNode } from 'react';
-import { Stream } from '../session/types/Participant';
+import { Participant } from '../session/Participant';
 import Video from './Video';
 
 export type SwitchTrack = (value: boolean) => void;
@@ -13,7 +14,7 @@ interface ChildrenProps {
 type ReactNodeFactory = (props: ChildrenProps) => ReactNode;
 
 interface Props extends HTMLProps<HTMLVideoElement> {
-  participant: Stream;
+  participant: Participant;
   children?: ReactNodeFactory;
 }
 

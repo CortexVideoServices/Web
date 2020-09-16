@@ -1,5 +1,5 @@
 import Session from './janus/Session';
-import { SessionListener, SessionSettings } from './types/Session';
+import { SessionListener, SessionSettings } from './Session';
 
 /// Builder for session object
 export default class SessionBuilder implements SessionSettings {

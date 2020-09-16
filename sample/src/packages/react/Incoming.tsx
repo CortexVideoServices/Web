@@ -1,6 +1,7 @@
+// ToDo: need to be refactored
 import React, { HTMLProps, ReactNode } from 'react';
 import { SessionContext } from './Session';
-import { Stream as Participant } from '../session/types/Participant';
+import { Participant } from '../session/Participant';
 import Stream from './Stream';
 
 interface Props extends HTMLProps<HTMLVideoElement> {
@@ -14,15 +15,15 @@ export const IncomingStreamsContext = React.createContext<Array<Participant> | n
 export default function ({ children, ...props }: Props) {
   const session = React.useContext(SessionContext);
   if (!session) throw new Error('Incoming streams context must be used within the session context');
-  const nnSession = session;
   const [streams, setStreams] = React.useState<Array<Participant>>([]);
   React.useEffect(() => {
-    const listener = nnSession.addListener({
-      onStreamReceived: () => setStreams(nnSession.remoteParticipants),
-      onStreamDropped: () => setStreams(nnSession.remoteParticipants),
+    const listener = session.addListener({
+      onStreamReceived: () => setStreams(session.remoteStreams),
+      onStreamDropped: () => setStreams(session.remoteStreams),
     });
-    return () => nnSession.removeListener(listener);
+    return () => session.removeListener(listener);
   });
+  console.log('#IncomingStreamsContext.Provider', streams);
   if (children) {
     return <IncomingStreamsContext.Provider value={streams}>{children}</IncomingStreamsContext.Provider>;
   } else return streams.length ? <Stream participant={streams[0]} {...props} /> : <></>;

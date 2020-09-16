@@ -4,19 +4,16 @@ import Session from '@cvs/react/Session';
 import Publisher from '@cvs/react/Publisher';
 import Incoming from '@cvs/react/Incoming';
 import Participants from '@cvs/react/Participants';
+import { SessionListener } from './packages/session/Session';
 
 interface Props {
   sessionBuilder: SessionBuilder;
+  eventHandlers: SessionListener;
 }
 
-export default function ({ sessionBuilder }: Props) {
+export default function ({ sessionBuilder, eventHandlers }: Props) {
   return (
-    <Session
-      sessionBuilder={sessionBuilder}
-      eventHandlers={{
-        onError: (reason: Error) => console.error('Session error received', reason),
-      }}
-    >
+    <Session sessionBuilder={sessionBuilder} eventHandlers={eventHandlers}>
       <Publisher width={320} className="streamView" />
 
       <Incoming>

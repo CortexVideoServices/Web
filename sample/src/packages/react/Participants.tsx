@@ -1,6 +1,7 @@
+// ToDo: need to be refactored
 import React, { HTMLProps, ReactNode } from 'react';
 import { IncomingStreamsContext } from './Incoming';
-import { Stream as Participant } from '../session/types/Participant';
+import { Participant } from '../session/Participant';
 import Stream from './Stream';
 
 interface ChildrenProps {

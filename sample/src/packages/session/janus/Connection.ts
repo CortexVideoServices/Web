@@ -1,62 +1,53 @@
-import Connection from '../abc/Connection';
-import { ConnectionError, ConnectionSettings, ConnectionState } from '../types/Connection';
-import { Data, JanusError, JSep, Message, Reject, Resolve } from './types';
+import Connection, { ConnectionListener, ConnectionSettings, ConnectionState, ConnectionError } from '../Connection';
+import { Reject, Resolve, Data, JanusError, JSep, Message } from './common';
+
+interface JanusConnectionListener extends ConnectionListener {
+  onEventMessage?(message: Message): void;
+}
 
 /// Janus implementation of the Connection interface
-export default class extends Connection {
-  private ws?: WebSocket;
+export default class JanusConnection extends Connection {
   private _state = ConnectionState.Closed;
-  /// Gets connection state
-  protected getConnectionState(): ConnectionState {
-    return this._state;
-  }
-
-  constructor(settings: ConnectionSettings, private onMessageListener?: (message: Message) => void) {
-    super(settings);
-  }
-
+  private ws: WebSocket | null = null;
   private sessionId: number = 0;
+  private resultWaiters = new Map<string, [Resolve, Reject, number]>();
+  private transaction: number = 0;
+
+  constructor(settings: ConnectionSettings, private listener?: JanusConnectionListener) {
+    super(settings, listener);
+  }
+
   /// Connects to the server
   async connect(): Promise<void> {
-    let ws: WebSocket | null = null;
-    const error = new ConnectionError('WebSocket cannot connect');
     try {
-      ws = new WebSocket(this.settings.serverUrl, 'janus-protocol');
-      ws.onmessage = (event) => this.onMessage(JSON.parse(event.data));
-      ws.onclose = (event) => {
+      this.ws = new WebSocket(this.settings.serverUrl, 'janus-protocol');
+      this.ws.onmessage = (event) => this.onMessage(JSON.parse(event.data));
+      this.ws.onclose = (event) => {
         if (!event.wasClean) this.emitError(new ConnectionError(event.reason));
         this.onDisconnect();
       };
       this._state = ConnectionState.Connecting;
+      const ws = this.ws;
       await new Promise<void>((resolve, reject) => {
-        if (ws) {
-          ws.onopen = () => resolve();
-          ws.onerror = (reason) => {
-            if (this.settings.debug) console.debug(reason);
-            reject(error);
-          };
-        } else reject(error);
+        ws.onopen = () => resolve();
+        ws.onerror = (reason) => {
+          if (this.settings.debug) console.debug(reason);
+          reject(new ConnectionError('WebSocket cannot connect'));
+        };
       });
-      ws.onerror = (reason) => {
+      this.ws.onerror = (reason) => {
         if (this.settings.debug) console.debug(reason);
         this.emitError(new ConnectionError('WebSocket error'));
       };
-      this.ws = ws;
       const [data] = await this.sendRequest({ janus: 'create' });
       this.sessionId = data.id;
       this.onConnected();
     } catch (reason) {
-      ws?.close();
-      this.ws = undefined;
+      this.ws?.close();
+      this.ws = null;
       this._state = ConnectionState.Closed;
       this.emitError(reason, true);
     }
-  }
-
-  private transaction: number = 0;
-  private get nextTransaction() {
-    this.transaction += 1;
-    return `t${this.transaction}`;
   }
 
   /// Sends message
@@ -69,8 +60,6 @@ export default class extends Connection {
     } else throw new ConnectionError('Tried to send message but connection absent');
   }
 
-  private resultWaiters = new Map<string, [Resolve, Reject, number]>();
-
   /// Sends request
   async sendRequest(request: Partial<Message>, timeout: number = 15): Promise<[Data, JSep | null]> {
     const transaction = await this.sendMessage(request);
@@ -79,12 +68,45 @@ export default class extends Connection {
     });
   }
 
+  /// Attaches plugin
+  async attache(pluginName: string): Promise<number> {
+    try {
+      const [data] = await this.sendRequest({ janus: 'attach', plugin: pluginName });
+      return data.id;
+    } catch (reason) {
+      this.emitError(reason, true);
+    }
+    return 0;
+  }
+
+  /// Detaches plugin
+  async detach(handleId: number): Promise<void> {
+    try {
+      if (this.state === ConnectionState.Connected) {
+        await this.sendMessage({ janus: 'detach', handle_id: handleId });
+      }
+    } catch (reason) {
+      this.emitError(reason, true);
+    }
+  }
+
   /// Closes and destructs object
   async close(): Promise<void> {
     if (this._state in [ConnectionState.Connecting, ConnectionState.Connected]) {
       this._state = ConnectionState.Closing;
       this.ws?.close();
     }
+  }
+
+  // Returns connection state
+  protected getState(): ConnectionState {
+    return this._state;
+  }
+
+  // transaction number generator
+  private get nextTransaction() {
+    this.transaction += 1;
+    return `t${this.transaction}`;
   }
 
   private async keepAlive(timeout: number) {
@@ -104,11 +126,11 @@ export default class extends Connection {
 
   private onConnected() {
     this._state = ConnectionState.Connected;
+    this.emitConnected();
     this.keepAlive(57).catch((reason) => {
       this.emitError(reason);
       this.close().catch((reason) => this.emitError(reason));
     });
-    this.emitConnected();
   }
 
   private onMessage(message: Message) {
@@ -125,7 +147,7 @@ export default class extends Connection {
       }
     }
     if (message.janus === 'event') {
-      this.onMessageListener?.call(this, message);
+      this.listener?.onEventMessage?.call(this, message);
     }
   }
 

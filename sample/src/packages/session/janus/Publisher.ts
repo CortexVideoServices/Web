@@ -1,85 +1,46 @@
-/// Janus implementation of the Publisher
-import Publisher from '../abc/Publisher';
+import Publisher, { PublisherListener, PublisherSettings } from '../Publisher';
 import JanusConnection from './Connection';
-import { ConnectionState } from '../types/Connection';
-import { CVSError } from '../types/common';
-import { PublisherListener, PublisherSettings } from '../types/Publisher';
-import JanusPlugin from './Plugin';
-import { JanusError } from './types';
+import { ConnectionState } from '../Connection';
+import { JanusError } from './common';
+import { CVSError } from '../common';
 
-export default class extends Publisher {
-  ///
-  private roomId: number;
-  private privateId: number = 0;
+/// Janus implementation of the Publisher
+export default class JanusPublisher extends Publisher {
+  private handleId: number = 0;
   private janusConnection: JanusConnection | null = null;
-  private plugin = new JanusPlugin('janus.plugin.videoroom');
 
-  constructor(settings: PublisherSettings, listener?: PublisherListener) {
+  public constructor(settings: PublisherSettings, listener?: PublisherListener) {
     super(settings, listener);
-    this.roomId = parseInt(settings.sessionId, 36);
   }
 
   /// Starts publishing
-  async startPublishing(janusConnection: JanusConnection): Promise<void> {
+  async startPublishing(janusConnection: JanusConnection, roomId: number): Promise<void> {
     if (janusConnection.state !== ConnectionState.Connected)
       throw new CVSError('Janus connection fail, cannot start publishing');
     this.janusConnection = janusConnection;
-    if (this.mediaStream) await this._startPublishing(this.janusConnection);
-  }
-
-  /// Stops publishing
-  async stopPublishing(): Promise<void> {
-    try {
-      if (this.mediaStream) await this._stopPublishing();
-    } finally {
-      this.janusConnection = null;
-    }
-  }
-
-  protected streamCreated(stream: MediaStream | null) {
-    super.streamCreated(stream);
-    if (this.janusConnection && !this.plugin.active) {
-      this._startPublishing(this.janusConnection).catch((reason) => this.emitError(reason));
-    }
-  }
-
-  protected streamDestroy() {
-    if (this.janusConnection && this.plugin.active)
-      this._stopPublishing()
-        .catch((reason) => this.emitError(reason))
-        .finally(() => super.streamDestroy());
-  }
-
-  protected sendTrickleCandidate(candidate: any): void {
-    this.plugin.sendMessage({ janus: 'trickle', candidate }).catch(() => null);
-  }
-
-  protected sendTrickleCompleted(): void {
-    this.plugin.sendMessage({ janus: 'trickle', candidate: { completed: true } }).catch(() => null);
-  }
-
-  async _startPublishing(janusConnection: JanusConnection) {
-    await this.plugin.attach(janusConnection);
+    this.handleId = await this.janusConnection.attache('janus.plugin.videoroom');
     while (true) {
       try {
-        const [data] = await this.plugin.sendRequest({
+        await this.janusConnection.sendRequest({
           janus: 'message',
-          body: { request: 'join', ptype: 'publisher', room: this.roomId },
+          handle_id: this.handleId,
+          body: { request: 'join', ptype: 'publisher', room: roomId },
         });
-        this.privateId = data.privateId;
         break;
       } catch (error) {
         if (error instanceof JanusError && error.code === 426) {
-          await this.plugin.sendRequest({
+          await this.janusConnection.sendRequest({
             janus: 'message',
-            body: { request: 'create', room: this.roomId, is_private: true },
+            handle_id: this.handleId,
+            body: { request: 'create', room: roomId, is_private: true },
           });
         }
       }
     }
     const jsepLocal = await this.createOffer();
-    const [, jsepRemote] = await this.plugin.sendRequest({
+    const [, jsepRemote] = await this.janusConnection.sendRequest({
       janus: 'message',
+      handle_id: this.handleId,
       body: { request: 'configure', audio: true, video: true, ...(this.name ? { display: this.name } : {}) },
       jsep: jsepLocal,
     });
@@ -87,9 +48,26 @@ export default class extends Publisher {
     await this.peerConnected();
   }
 
-  async _stopPublishing() {
-    // ToDo: send unpublish message
-    await this.plugin.detach();
-    await this.closePeer();
+  /// Stops publishing
+  async stopPublishing(): Promise<void> {
+    try {
+      if (this.janusConnection && this.handleId > 0 && this.janusConnection.state === ConnectionState.Connected)
+        await this.janusConnection.detach(this.handleId);
+    } finally {
+      this.handleId = 0;
+      this.janusConnection = null;
+    }
+  }
+
+  protected sendTrickleCandidate(candidate: any): void {
+    if (this.janusConnection)
+      this.janusConnection.sendMessage({ janus: 'trickle', handle_id: this.handleId, candidate }).catch(() => null);
+  }
+
+  protected sendTrickleCompleted(): void {
+    if (this.janusConnection)
+      this.janusConnection
+        .sendMessage({ janus: 'trickle', handle_id: this.handleId, candidate: { completed: true } })
+        .catch(() => null);
   }
 }

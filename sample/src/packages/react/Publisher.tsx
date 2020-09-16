@@ -1,13 +1,10 @@
 import React, { HTMLProps, ReactNode } from 'react';
 import { SessionContext } from './Session';
-import { PublisherListener } from '@cvs/session/types/Publisher';
+import { PublisherListener } from '@cvs/session/Publisher';
+import { AudioConstraints, VideoConstraints } from '@cvs/session/Constraints';
 import PublisherBuilder from '@cvs/session/PublisherBuilder';
-import { AudioConstraints, VideoConstraints } from '@cvs/session/types/Constraints';
-import Publisher from '@cvs/session/abc/Publisher';
+import Publisher from '@cvs/session/Publisher';
 import LocalStream from './LocalStream';
-
-/// Publisher context
-export const PublisherContext = React.createContext<Publisher | null>(null);
 
 interface Props extends HTMLProps<HTMLVideoElement> {
   publisherBuilder?: PublisherBuilder;
@@ -18,6 +15,9 @@ interface Props extends HTMLProps<HTMLVideoElement> {
   eventHandlers?: PublisherListener;
   children?: ReactNode;
 }
+
+/// Publisher context
+export const PublisherContext = React.createContext<Publisher | null>(null);
 
 /// Local stream publisher
 export default function ({
@@ -45,9 +45,10 @@ export default function ({
   React.useEffect(() => {
     publisher.startCapturer().catch(console.error);
     return () => {
-      publisher.destroy().catch(console.error);
+      publisher.stopPublishing().catch(console.error);
     };
   });
-  if (children) return <PublisherContext.Provider value={publisher}>{children}</PublisherContext.Provider>;
-  else return <LocalStream publisher={publisher} {...props} />;
+  console.log('#PublisherContext.Provider', publisher);
+  children = children || <LocalStream {...props} />;
+  return <PublisherContext.Provider value={publisher}>{children}</PublisherContext.Provider>;
 }

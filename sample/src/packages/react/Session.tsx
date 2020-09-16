@@ -1,7 +1,6 @@
 import React, { PropsWithChildren } from 'react';
-import Session from '@cvs/session/abc/Session';
+import Session, { SessionListener } from '@cvs/session/Session';
 import SessionBuilder from '@cvs/session/SessionBuilder';
-import { SessionListener } from '@cvs/session/types/Session';
 
 interface Props {
   sessionBuilder: SessionBuilder;
@@ -16,7 +15,10 @@ export default function ({ sessionBuilder, eventHandlers, children }: PropsWithC
   const session = sessionBuilder.build(eventHandlers);
   React.useEffect(() => {
     session.connect().catch(console.error);
-    return () => session.disconnect();
+    return () => {
+      session.disconnect().catch(console.error);
+    };
   });
+  console.log('#Session', session);
   return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
 }
