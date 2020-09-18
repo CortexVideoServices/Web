@@ -9,9 +9,9 @@ export interface Participant {
   readonly name?: string;
   /// Media stream
   readonly mediaStream: MediaStream | null;
-  /// Enable/disable audio track or constrains
+  /// Audio track constrains
   readonly audio: boolean | AudioConstraints | MediaTrackConstraints;
-  /// Enable/disable video track or constrains
+  /// Video track constrains
   readonly video: boolean | VideoConstraints | MediaTrackConstraints;
 }
 
@@ -102,7 +102,10 @@ export default abstract class AbcParticipant implements Participant {
 
   /// Closes participant stream
   protected async closeStream() {
-    this._mediaStream?.getTracks().forEach((track) => track.stop());
+    if (this._mediaStream) {
+      this.emitStreamDestroy(this);
+      this._mediaStream.getTracks().forEach((track) => track.stop());
+    }
     this._peerConnection?.close();
     this._peerConnection = null;
     this._mediaStream = null;

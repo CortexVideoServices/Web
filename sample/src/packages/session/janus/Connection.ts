@@ -92,7 +92,7 @@ export default class JanusConnection extends Connection {
 
   /// Closes and destructs object
   async close(): Promise<void> {
-    if (this._state in [ConnectionState.Connecting, ConnectionState.Connected]) {
+    if ([ConnectionState.Connecting, ConnectionState.Connected].indexOf(this._state) >= 0) {
       this._state = ConnectionState.Closing;
       this.ws?.close();
     }

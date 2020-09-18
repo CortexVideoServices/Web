@@ -39,16 +39,24 @@ export default class JanusSession extends Session {
 
   protected async startPublishing(publisher: JanusPublisher): Promise<void> {
     await publisher.startPublishing(this.janusConnection, this.roomId);
+    this.emitPublishingStarted(publisher);
   }
 
   protected async stopPublishing(publisher: JanusPublisher): Promise<void> {
     await publisher.stopPublishing();
+    this.emitPublishingStopped(publisher);
+  }
+
+  protected async closeAll(): Promise<void> {
+    this.remoteFeeds.forEach((participant) =>
+      participant.stopSubscribing().finally(() => null /*this.emitStreamDropped(participant)*/)
+    );
   }
 
   private onEventMessage(message: Message) {
     const data = message.plugindata.data;
     if (data.publishers) {
-      if (data.private_id) this.privateId = data.private_id;
+      if (!data.private_id) this.privateId = data.private_id;
       data.publishers.forEach((feed: FeedData) => {
         if (feed.id && !this.remoteFeeds.has(feed.id)) {
           const remoteParticipant = new RemoteParticipant(this.settings, {

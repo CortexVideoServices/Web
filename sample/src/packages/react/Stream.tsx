@@ -1,12 +1,13 @@
-// ToDo: need to be refactored
 import React, { HTMLProps, ReactNode } from 'react';
+import { ParticipantsContext } from './IncomingStream';
 import { Participant } from '../session/Participant';
 import Video from './Video';
 
-export type SwitchTrack = (value: boolean) => void;
+type SwitchTrack = (value: boolean) => void;
 
 interface ChildrenProps {
   stream: MediaStream | null;
+  participantName: string;
   // enableAudio: SwitchTrack;
   // enableVideo: SwitchTrack;
 }
@@ -14,23 +15,22 @@ interface ChildrenProps {
 type ReactNodeFactory = (props: ChildrenProps) => ReactNode;
 
 interface Props extends HTMLProps<HTMLVideoElement> {
-  participant: Participant;
-  children?: ReactNodeFactory;
+  participant?: Participant;
+  clone?: boolean;
+  children?: ReactNode | ReactNodeFactory;
 }
 
-/// Stream component
-export default function ({ participant, children, ...props }: Props) {
-  // const audio = participant.audio;
-  // const video = participant.video;
-  if (children instanceof Function)
+/// Remote stream
+export default function ({ participant, clone = false, children, ...props }: Props) {
+  let participants = participant ? [participant] : React.useContext(ParticipantsContext);
+  if (participants.length && !clone) participants = [participants[0]];
+  if (children instanceof Function) return <></>;
+  else
     return (
       <>
-        {children({
-          stream: participant.mediaStream,
-          // enableAudio: (value) => (participant.audio = value ? audio : false),
-          // enableVideo: (value) => (participant.video = value ? video : false),
-        })}
+        {participants.map((participant, index) => (
+          <Video key={index} stream={participant.mediaStream} {...props} />
+        ))}
       </>
     );
-  else return <Video stream={participant.mediaStream} {...props} />;
 }

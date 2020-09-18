@@ -66,17 +66,17 @@ export default abstract class AbcConnection {
 
   /// Emits `onConnected` event
   protected emitConnected() {
-    this.listeners.forEach((listener) => listener.onConnected?.call(this));
+    Array.from(this.listeners).forEach((listener) => listener.onConnected?.call(this));
   }
 
   /// Emits `onDisconnected` event
   protected emitDisconnected() {
-    this.listeners.forEach((listener) => listener.onDisconnected?.call(this));
+    Array.from(this.listeners).forEach((listener) => listener.onDisconnected?.call(this));
   }
 
   /// Emits `onError` event
   protected emitError(reason: Error, andThrow: boolean = false) {
-    this.listeners.forEach((listener) => listener.onError?.call(this, reason));
+    Array.from(this.listeners).forEach((listener) => listener.onError?.call(this, reason));
     if (andThrow) throw reason;
   }
 }

@@ -1,6 +1,6 @@
 import Connection, { ConnectionSettings, ConnectionListener, ConnectionState } from './Connection';
 import { Participant, ParticipantListener } from './Participant';
-import Publisher from './Publisher';
+import { Publisher } from './Publisher';
 
 /// Session settings
 export interface SessionSettings extends ConnectionSettings {
@@ -28,6 +28,30 @@ export interface SessionListener {
   onConnectionError?(reason: Error): void;
   /// Called when the session client has disconnected from the session server.
   onDisconnected?(): void;
+}
+
+/// Session interface
+export interface Session {
+  /// Session settings
+  readonly settings: SessionSettings;
+  /// Session ID
+  readonly id: string;
+  /// Session connection
+  readonly connection: Connection;
+  /// Received streams from the remote participants.
+  readonly remoteStreams: Array<Participant>;
+  /// Connects to the sessions server
+  connect(): Promise<void>;
+  /// Add publisher to this session
+  addPublisher(publisher: Publisher): void;
+  /// Remove publisher from this session
+  removePublisher(publisher: Publisher): void;
+  /// Disconnects from the sessions server
+  disconnect(): Promise<void>;
+  /// Adds session listener
+  addListener(listener: SessionListener): SessionListener;
+  /// Removes session listener
+  removeListener(listener: SessionListener): void;
 }
 
 /// Session abstract base class
@@ -61,6 +85,8 @@ export default abstract class AbcSession {
   protected abstract startPublishing(publisher: Publisher): Promise<void>;
   /// Stops publishing
   protected abstract stopPublishing(publisher: Publisher): Promise<void>;
+  /// Closes all remote streams
+  protected abstract closeAll(): Promise<void>;
 
   protected constructor(settings: SessionSettings, listener?: SessionListener) {
     this.settings = settings;
@@ -69,16 +95,18 @@ export default abstract class AbcSession {
 
   private connectionListener: ConnectionListener = {
     onConnected: () => {
-      this.listeners.forEach((listener) => listener.onConnected?.call(this));
+      Array.from(this.listeners).forEach((listener) => listener.onConnected?.call(this));
       for (const publisher of this.publishersMap.keys()) {
         if (publisher.mediaStream) this.startPublishing(publisher).catch((reason) => this.emitError(reason));
       }
     },
     onDisconnected: () => {
-      this.remoteStreamsSet.forEach((participant) => this.emitStreamDropped(participant));
-      this.listeners.forEach((listener) => listener.onDisconnected?.call(this));
+      this.closeAll().finally(() => {
+        Array.from(this.listeners).forEach((listener) => listener.onDisconnected?.call(this));
+      });
     },
-    onError: (reason: Error) => this.listeners.forEach((listener) => listener.onConnectionError?.call(this, reason)),
+    onError: (reason: Error) =>
+      Array.from(this.listeners).forEach((listener) => listener.onConnectionError?.call(this, reason)),
   };
 
   /// Connects to the sessions server
@@ -140,25 +168,25 @@ export default abstract class AbcSession {
 
   /// Emits event `onError`
   protected emitError(reason: Error, andThrow: boolean = false): void {
-    this.listeners.forEach((listener) => listener.onError?.call(this, reason));
+    Array.from(this.listeners).forEach((listener) => listener.onError?.call(this, reason));
     if (andThrow) throw reason;
   }
 
   /// Emits event `onPublishingStarted`
   protected emitPublishingStarted(publisher: Publisher) {
-    this.listeners.forEach((listener) => listener.onPublishingStarted?.call(this, publisher));
+    Array.from(this.listeners).forEach((listener) => listener.onPublishingStarted?.call(this, publisher));
   }
 
   /// Emits event `onPublishingStopped`
   protected emitPublishingStopped(publisher: Publisher) {
-    this.listeners.forEach((listener) => listener.onPublishingStopped?.call(this, publisher));
+    Array.from(this.listeners).forEach((listener) => listener.onPublishingStopped?.call(this, publisher));
   }
 
   // Emits event `StreamReceived`
   protected emitStreamReceived(participant: Participant) {
     if (!this.remoteStreamsSet.has(participant)) {
       this.remoteStreamsSet.add(participant);
-      this.listeners.forEach((listener) => listener.onStreamReceived?.call(this, participant));
+      Array.from(this.listeners).forEach((listener) => listener.onStreamReceived?.call(this, participant));
     }
   }
 
@@ -166,7 +194,7 @@ export default abstract class AbcSession {
   protected emitStreamDropped(participant: Participant) {
     if (this.remoteStreamsSet.has(participant)) {
       this.remoteStreamsSet.delete(participant);
-      this.listeners.forEach((listener) => listener.onStreamDropped?.call(this, participant));
+      Array.from(this.listeners).forEach((listener) => listener.onStreamDropped?.call(this, participant));
     }
   }
 }

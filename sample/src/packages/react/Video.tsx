@@ -13,6 +13,5 @@ export default function ({ stream = null, ...props }: Props) {
   React.useEffect(() => {
     if (videoElement.current) videoElement.current.srcObject = stream;
   });
-  console.log('!!! Video', stream);
   return <video ref={videoElement} {...props} autoPlay />;
 }

@@ -5,9 +5,9 @@ import { AudioConstraints, VideoConstraints } from './Constraints';
 export interface PublisherSettings extends ParticipantSettings {
   /// Session ID
   readonly sessionId: string;
-  /// Enable/disable audio track or constrains
+  /// Audio track constrains
   readonly audio: boolean | AudioConstraints;
-  /// Enable/disable video track or constrains
+  /// Video track constrains
   readonly video: boolean | VideoConstraints;
 }
 
@@ -17,8 +17,34 @@ export interface PublisherListener extends ParticipantListener {
   onAccessDialog?(display: boolean): void;
 }
 
+/// Publisher interface
+export interface Publisher extends Participant {
+  /// Publisher settings
+  readonly settings: PublisherSettings;
+  /// Audio track constrains
+  readonly audio: boolean | AudioConstraints;
+  /// Video track constrains
+  readonly video: boolean | VideoConstraints;
+  // Access to camera granted/denied
+  readonly accessGranted: boolean;
+  /// List of camera devices [[id, label]]
+  readonly camList: Array<[string, string]>;
+  /// List of mic devices [[id, label]]
+  readonly micList: Array<[string, string]>;
+  /// Starts media stream capturer
+  startCapturer(video?: boolean | VideoConstraints, audio?: boolean | AudioConstraints): Promise<MediaStream | null>;
+  /// Switches camera
+  switchCamera(deviceId?: string | VideoConstraints): Promise<MediaStream | null>;
+  /// Stops media stream capturer
+  stopCapturer(): Promise<void>;
+  /// Adds publisher listener
+  addListener(listener: PublisherListener): PublisherListener;
+  /// Removes publisher listener
+  removeListener(listener: PublisherListener): void;
+}
+
 /// Abstract base class of local stream publisher
-export default abstract class AbcPublisher extends AbcParticipant {
+export default abstract class AbcPublisher extends AbcParticipant implements Publisher {
   /// Publisher settings
   readonly settings: PublisherSettings;
 
@@ -62,15 +88,16 @@ export default abstract class AbcPublisher extends AbcParticipant {
 
   /// Starts media stream capturer
   async startCapturer(
-    video?: boolean | VideoConstraints,
-    audio?: boolean | AudioConstraints
+    video: boolean | VideoConstraints = true,
+    audio: boolean | AudioConstraints = true
   ): Promise<MediaStream | null> {
     this.setAudio(typeof audio !== 'undefined' ? audio : this.settings.audio);
     this.setVideo(typeof video !== 'undefined' ? video : this.settings.video);
     await this.stopCapturer();
     if (!this.camDevices.size) await this.updateDeviceList();
     if (!this.audio && !this.video) return null;
-    if (!this._accessGranted) this.listeners.forEach((listener) => listener.onAccessDialog?.call(this, true));
+    if (!this._accessGranted)
+      Array.from(this.listeners).forEach((listener) => listener.onAccessDialog?.call(this, true));
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: this.audio,
@@ -85,7 +112,7 @@ export default abstract class AbcPublisher extends AbcParticipant {
     } catch (result) {
       this.emitError(result, true);
     } finally {
-      this.listeners.forEach((listener) => listener.onAccessDialog?.call(this, false));
+      Array.from(this.listeners).forEach((listener) => listener.onAccessDialog?.call(this, false));
     }
     return null;
   }
@@ -137,18 +164,18 @@ export default abstract class AbcPublisher extends AbcParticipant {
 
   /// Emits event `onError`
   protected emitError(reason: Error, andThrow: boolean = false): void {
-    this.listeners.forEach((listener) => listener.onError?.call(this, reason));
+    Array.from(this.listeners).forEach((listener) => listener.onError?.call(this, reason));
     if (andThrow) throw reason;
   }
 
   /// Emits event `onStreamCreated`
   protected emitStreamCreated(participant: Participant): void {
-    this.listeners.forEach((listener) => listener.onStreamCreated?.call(this, participant));
+    Array.from(this.listeners).forEach((listener) => listener.onStreamCreated?.call(this, participant));
   }
 
   /// Emits event `onStreamDestroy`
   protected emitStreamDestroy(participant: Participant): void {
-    this.listeners.forEach((listener) => listener.onStreamDestroy?.call(this, participant));
+    Array.from(this.listeners).forEach((listener) => listener.onStreamDestroy?.call(this, participant));
   }
 
   private setAudio(value: boolean | AudioConstraints) {

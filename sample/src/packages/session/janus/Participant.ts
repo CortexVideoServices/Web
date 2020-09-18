@@ -49,6 +49,7 @@ export default class JanusParticipant extends Participant {
     } finally {
       this.handleId = 0;
       this.janusConnection = null;
+      this.closeStream().catch((reason) => this.emitError(reason, false));
     }
   }
 

@@ -32,7 +32,7 @@ export default class JanusPublisher extends Publisher {
           await this.janusConnection.sendRequest({
             janus: 'message',
             handle_id: this.handleId,
-            body: { request: 'create', room: roomId, is_private: true },
+            body: { request: 'create', room: roomId, is_private: true, publishers: 6 },
           });
         }
       }

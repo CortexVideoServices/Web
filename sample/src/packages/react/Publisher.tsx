@@ -1,9 +1,8 @@
 import React, { HTMLProps, ReactNode } from 'react';
 import { SessionContext } from './Session';
-import { PublisherListener } from '@cvs/session/Publisher';
+import { Publisher, PublisherListener } from '@cvs/session/Publisher';
 import { AudioConstraints, VideoConstraints } from '@cvs/session/Constraints';
 import PublisherBuilder from '@cvs/session/PublisherBuilder';
-import Publisher from '@cvs/session/Publisher';
 import LocalStream from './LocalStream';
 
 interface Props extends HTMLProps<HTMLVideoElement> {
@@ -21,7 +20,6 @@ export const PublisherContext = React.createContext<Publisher | null>(null);
 
 /// Local stream publisher
 export default function ({
-  publisherBuilder,
   participantName,
   audio = true,
   video = true,
@@ -31,24 +29,18 @@ export default function ({
   ...props
 }: Props) {
   const session = React.useContext(SessionContext);
-  if (!publisherBuilder) {
-    if (session) publisherBuilder = new PublisherBuilder(session, participantName, audio, video);
-    else if (autoPublishing)
-      throw new Error('Publisher component must be used within the session context if enabled auto publishing.');
-  }
-  if (!publisherBuilder)
-    throw new Error('Publisher component must be used within the session context or with the publisher builder.');
+  if (!session) throw new Error('Publisher component must be used within the session context.');
+  const publisherBuilder = new PublisherBuilder(session, participantName, audio, video);
   if (participantName) publisherBuilder.participantName = participantName;
   if (publisherBuilder.audio instanceof Boolean) publisherBuilder.audio = audio;
   if (publisherBuilder.video instanceof Boolean) publisherBuilder.video = video;
-  const publisher = publisherBuilder.build(eventHandlers, autoPublishing);
+  const publisher = publisherBuilder.build(eventHandlers, autoPublishing, true);
   React.useEffect(() => {
     publisher.startCapturer().catch(console.error);
     return () => {
-      publisher.stopPublishing().catch(console.error);
+      publisher.stopCapturer().catch(console.error);
     };
   });
-  console.log('#PublisherContext.Provider', publisher);
   children = children || <LocalStream {...props} />;
   return <PublisherContext.Provider value={publisher}>{children}</PublisherContext.Provider>;
 }
