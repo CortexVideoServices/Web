@@ -1,6 +1,6 @@
 import React, { HTMLProps, ReactNode } from 'react';
 import { SessionContext } from './Session';
-import { Publisher, PublisherListener } from '@cvs/session/Publisher';
+import Publisher, { PublisherListener } from '@cvs/session/Publisher';
 import { AudioConstraints, VideoConstraints } from '@cvs/session/Constraints';
 import PublisherBuilder from '@cvs/session/PublisherBuilder';
 import LocalStream from './LocalStream';
@@ -34,7 +34,7 @@ export default function ({
   if (participantName) publisherBuilder.participantName = participantName;
   if (publisherBuilder.audio instanceof Boolean) publisherBuilder.audio = audio;
   if (publisherBuilder.video instanceof Boolean) publisherBuilder.video = video;
-  const publisher = publisherBuilder.build(eventHandlers, autoPublishing, true);
+  const publisher = publisherBuilder.build(eventHandlers, autoPublishing);
   React.useEffect(() => {
     publisher.startCapturer().catch(console.error);
     return () => {

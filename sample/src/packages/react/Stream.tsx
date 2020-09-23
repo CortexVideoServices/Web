@@ -1,5 +1,4 @@
 import React, { HTMLProps, ReactNode } from 'react';
-import { ParticipantsContext } from './IncomingStream';
 import { Participant } from '../session/Participant';
 import Video from './Video';
 
@@ -8,29 +7,38 @@ type SwitchTrack = (value: boolean) => void;
 interface ChildrenProps {
   stream: MediaStream | null;
   participantName: string;
-  // enableAudio: SwitchTrack;
-  // enableVideo: SwitchTrack;
+  enableAudio: SwitchTrack;
+  enableVideo: SwitchTrack;
 }
 
 type ReactNodeFactory = (props: ChildrenProps) => ReactNode;
 
 interface Props extends HTMLProps<HTMLVideoElement> {
   participant?: Participant;
-  clone?: boolean;
+  index?: number;
   children?: ReactNode | ReactNodeFactory;
 }
 
+/// Participants context
+export const ParticipantContext = React.createContext<Participant | undefined>(undefined);
+
 /// Remote stream
-export default function ({ participant, clone = false, children, ...props }: Props) {
-  let participants = participant ? [participant] : React.useContext(ParticipantsContext);
-  if (participants.length && !clone) participants = [participants[0]];
-  if (children instanceof Function) return <></>;
-  else
+export default function ({ participant, index, children, ...props }: Props) {
+  if (!participant) participant = React.useContext(ParticipantContext) || undefined;
+  if (!participant)
+    throw new Error('Stream component must be used with the participant or within the participant context.');
+  if (children instanceof Function) {
+    const stream = participant ? participant.mediaStream : null;
+    const participantName = participant ? participant.name || '' : '';
     return (
       <>
-        {participants.map((participant, index) => (
-          <Video key={index} stream={participant.mediaStream} {...props} />
-        ))}
+        {children({
+          stream: stream,
+          participantName: participantName,
+          enableAudio: (value) => null,
+          enableVideo: (value) => null,
+        })}
       </>
     );
+  } else return <Video key={index} stream={participant.mediaStream} {...props} />;
 }

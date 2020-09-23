@@ -1,5 +1,5 @@
 import JanusSession from './janus/Session';
-import { Session, SessionListener, SessionSettings } from './Session';
+import Session, { SessionListener, SessionSettings } from './Session';
 
 /// Builder for session object
 export default class SessionBuilder implements SessionSettings {
@@ -27,25 +27,7 @@ export default class SessionBuilder implements SessionSettings {
   }
 
   /// Creates session
-  build(listener?: SessionListener, makeProxy: boolean = false): Session {
-    const session = new JanusSession(this, listener);
-    if (makeProxy)
-      return {
-        id: session.id,
-        settings: session.settings,
-        get connection() {
-          return session.connection;
-        },
-        get remoteStreams() {
-          return session.remoteStreams;
-        },
-        connect: () => session.connect(),
-        addPublisher: (publisher) => session.addPublisher(publisher),
-        removePublisher: (publisher) => session.removePublisher(publisher),
-        disconnect: () => session.disconnect(),
-        addListener: (listener: SessionListener) => session.addListener(listener),
-        removeListener: (listener) => session.removeListener(listener),
-      };
-    else return session;
+  build(listener?: SessionListener): Session {
+    return new JanusSession(this, listener);
   }
 }

@@ -1,6 +1,6 @@
 import Connection, { ConnectionSettings, ConnectionListener, ConnectionState } from './Connection';
 import { Participant, ParticipantListener } from './Participant';
-import { Publisher } from './Publisher';
+import Publisher from './Publisher';
 
 /// Session settings
 export interface SessionSettings extends ConnectionSettings {
@@ -29,7 +29,7 @@ export interface SessionListener {
   /// Called when the session client has disconnected from the session server.
   onDisconnected?(): void;
 }
-
+/*
 /// Session interface
 export interface Session {
   /// Session settings
@@ -53,9 +53,9 @@ export interface Session {
   /// Removes session listener
   removeListener(listener: SessionListener): void;
 }
-
+*/
 /// Session abstract base class
-export default abstract class AbcSession {
+export default abstract class Session {
   /// Session settings
   readonly settings: SessionSettings;
 

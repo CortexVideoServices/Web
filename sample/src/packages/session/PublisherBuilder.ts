@@ -1,6 +1,6 @@
-import { Session } from './Session';
+import Session from './Session';
 import JanusPublisher from './janus/Publisher';
-import { Publisher, PublisherListener, PublisherSettings } from './Publisher';
+import Publisher, { PublisherListener, PublisherSettings } from './Publisher';
 import { AudioConstraints, VideoConstraints } from './Constraints';
 
 /// Builder for local stream publisher
@@ -33,7 +33,7 @@ export default class PublisherBuilder implements PublisherSettings {
   }
 
   /// Creates publisher
-  build(listener?: PublisherListener, autoPublishing: boolean = false, makeProxy: boolean = false): Publisher {
+  build(listener?: PublisherListener, autoPublishing: boolean = false): Publisher {
     const result = new JanusPublisher(this, listener);
     if (autoPublishing) this.session.addPublisher(result);
     return result;

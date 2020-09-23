@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { Route, Switch } from 'react-router-dom';
 import { SessionListener } from '@cvs/session/Session';
 import { PublisherListener } from '@cvs/session/Publisher';
-import Publisher from '@cvs/react/Publisher';
 import Session from '@cvs/react/Session';
-import IncomingStream from './packages/react/IncomingStream';
+import Sample2 from './Sample2';
 
 const sessionListener: SessionListener = {
   onStreamDropped: (participant) => console.info('@Session.onStreamDropped', participant),
@@ -27,17 +25,9 @@ const publisherListener: PublisherListener = {
 export default function () {
   return (
     <div className="App">
-      <Switch>
-        <Route path="/start">
-          <Session sessionId="TEST021" eventHandlers={sessionListener}>
-            <Publisher width={320} className="streamView" eventHandlers={publisherListener} />
-            <IncomingStream width={320} clone={true} className="streamView" />
-          </Session>
-        </Route>
-        <Route path="*">
-          <h1>Welcome!</h1>
-        </Route>
-      </Switch>
+      <Session sessionId="TEST021" eventHandlers={sessionListener}>
+        <Sample2 sessionId="TEST0021" sessionListener={sessionListener} publisherListener={publisherListener} />
+      </Session>
     </div>
   );
 }

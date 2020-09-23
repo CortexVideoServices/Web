@@ -1,7 +1,7 @@
 import React, { HTMLProps, ReactNode } from 'react';
 import { SessionContext } from './Session';
 import { Participant } from '@cvs/session/Participant';
-import Stream from './Stream';
+import Stream, { ParticipantContext } from './Stream';
 
 interface Props extends HTMLProps<HTMLVideoElement> {
   clone?: boolean;
@@ -27,6 +27,19 @@ export default function ({ clone = false, children, ...props }: Props) {
     });
     return () => session.removeListener(listener);
   });
-  children = children || <Stream clone={clone} {...props} />;
-  return <ParticipantsContext.Provider value={participants}>{children}</ParticipantsContext.Provider>;
+  const participantsToOut = !clone && participants.length ? [participants[0]] : participants;
+  return (
+    <>
+      {participantsToOut.map((participant, index) => {
+        console.log('%%', children);
+        children = children || (participant ? <Stream participant={participant} {...props} /> : <></>);
+        console.log('##', children);
+        return (
+          <ParticipantContext.Provider value={participant} key={index}>
+            {children}
+          </ParticipantContext.Provider>
+        );
+      })}
+    </>
+  );
 }

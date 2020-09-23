@@ -16,7 +16,7 @@ export interface PublisherListener extends ParticipantListener {
   /// Appeared / Disappeared dialog for requesting access to local media devices (mic, camera)
   onAccessDialog?(display: boolean): void;
 }
-
+/*
 /// Publisher interface
 export interface Publisher extends Participant {
   /// Publisher settings
@@ -42,9 +42,9 @@ export interface Publisher extends Participant {
   /// Removes publisher listener
   removeListener(listener: PublisherListener): void;
 }
-
+*/
 /// Abstract base class of local stream publisher
-export default abstract class AbcPublisher extends AbcParticipant implements Publisher {
+export default abstract class Publisher extends AbcParticipant {
   /// Publisher settings
   readonly settings: PublisherSettings;
 
