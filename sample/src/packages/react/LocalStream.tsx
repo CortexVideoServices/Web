@@ -44,8 +44,8 @@ export default function ({ children, ...props }: Props) {
             stream: stream,
             participantName: participantName,
             switchCamera: (deviceId) => publisher.switchCamera(deviceId),
-            enableAudio: (value) => publisher.startCapturer(video, value ? audio : false),
-            enableVideo: (value) => publisher.startCapturer(value ? video : false, audio),
+            enableAudio: (value) => publisher.startCapturer(video, value),
+            enableVideo: (value) => publisher.startCapturer(value, audio),
           })}
         </>
       );
