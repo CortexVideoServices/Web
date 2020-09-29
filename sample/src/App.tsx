@@ -25,9 +25,7 @@ const publisherListener: PublisherListener = {
 export default function () {
   return (
     <div className="App">
-      <Session sessionId="TEST021" eventHandlers={sessionListener}>
-        <Sample2 sessionId="TEST0021" sessionListener={sessionListener} publisherListener={publisherListener} />
-      </Session>
+      <Sample2 sessionId="TEST0021" sessionListener={sessionListener} publisherListener={publisherListener} />
     </div>
   );
 }

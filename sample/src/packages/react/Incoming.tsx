@@ -31,9 +31,7 @@ export default function ({ clone = false, children, ...props }: Props) {
   return (
     <>
       {participantsToOut.map((participant, index) => {
-        console.log('%%', children);
         children = children || (participant ? <Stream participant={participant} {...props} /> : <></>);
-        console.log('##', children);
         return (
           <ParticipantContext.Provider value={participant} key={index}>
             {children}

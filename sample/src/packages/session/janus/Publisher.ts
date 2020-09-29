@@ -34,7 +34,7 @@ export default class JanusPublisher extends Publisher {
             handle_id: this.handleId,
             body: { request: 'create', room: roomId, is_private: true, publishers: 6 },
           });
-        }
+        } else this.emitError(error, true);
       }
     }
     const jsepLocal = await this.createOffer();

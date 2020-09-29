@@ -20,7 +20,7 @@ export default class JanusConnection extends Connection {
   /// Connects to the server
   async connect(): Promise<void> {
     try {
-      this.ws = new WebSocket(this.settings.serverUrl, 'janus-protocol');
+      this.ws = new WebSocket(this.settings.serverUrl);
       this.ws.onmessage = (event) => this.onMessage(JSON.parse(event.data));
       this.ws.onclose = (event) => {
         if (!event.wasClean) this.emitError(new ConnectionError(event.reason));
@@ -118,7 +118,7 @@ export default class JanusConnection extends Connection {
         const now = Date.now();
         Array.from(this.resultWaiters.keys()).forEach((key) => {
           const item = this.resultWaiters.get(key);
-          if (item) if (item[2] <= now) item[1](new ConnectionError('Connection timeout'));
+          if (item && item[2] <= now) item[1](new ConnectionError(`Connection timeout; ${key}`));
         });
       }
     }

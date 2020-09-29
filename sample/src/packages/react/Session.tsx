@@ -11,8 +11,7 @@ interface Props {
 function defaultUrl(): string {
   let { protocol, hostname, port } = window.location;
   protocol = protocol === 'http:' ? 'ws' : 'wss';
-  port = hostname === 'localhost' ? '8188' : port;
-  return `${protocol}://${hostname}:${port}/janus-ws`;
+  return `${protocol}://${hostname}:${port}/v1/ws`;
 }
 
 /// Session context
