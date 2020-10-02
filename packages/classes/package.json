@@ -1,0 +1,33 @@
+{
+  "version": "0.0.0",
+  "name": "@cvss/classes",
+  "author": "Alesh <alexey.poryadin@gmail.com>",
+  "description": "Base classes of the Cortex Video Services Web SDK",
+  "homepage": "https://github.com/CortexVideoServices/Web",
+  "license": "LGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CortexVideoServices/Web.git",
+    "directory": "packages/classes"
+  },
+  "scripts": {
+    "start": "tsdx watch --tsconfig tsconfig.build.json --verbose --noClean",
+    "build": "tsdx build --tsconfig tsconfig.build.json",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepublish": "npm run build"
+  },
+  "main": "dist/index.js",
+  "module": "dist/utils.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "README.md",
+    "dist"
+  ],
+  "dependencies": {
+    "webrtc-adapter": "^7.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

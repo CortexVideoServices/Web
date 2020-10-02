@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.build.json",
+  "include": ["packages", "types", "scripts", "example"],
+  "compilerOptions": {
+    "target": "ES5",
+    "allowJs": false,
+    "downlevelIteration": true,
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "paths": {
+      "@cvss/classes": ["packages/classes/src"],
+      "@cvss/classes/*": ["packages/classes/src/*"],
+      "@cvss/react": ["packages/react/src"],
+      "@cvss/react/*": ["packages/react/src/*"],
+      "$test/*": ["test/*"]
+    }
+  }
+}
