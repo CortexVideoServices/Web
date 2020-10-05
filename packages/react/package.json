@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "name": "@cvss/react",
   "author": "Alesh <alexey.poryadin@gmail.com>",
   "description": "React components part of the Cortex Video Services Web SDK",
@@ -20,13 +20,12 @@
   "main": "dist/index.js",
   "module": "dist/react.esm.js",
   "typings": "dist/index.d.ts",
-
   "files": [
     "README.md",
     "dist"
   ],
   "dependencies": {
-    "@cvss/classes": "^0.0.0"
+    "@cvss/classes": "^0.1.0-alpha.0"
   },
   "peerDependencies": {
     "react": "^16.8.0",
