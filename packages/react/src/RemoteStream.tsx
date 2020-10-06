@@ -27,6 +27,7 @@ export function RemoteStream({ participant, index, children, ...props }: Props) 
   if (!participant) participant = React.useContext(ParticipantContext) || undefined;
   if (!participant)
     throw new Error('RemoteStream component must be used with the participant or within the participant context.');
+  props.muted = false
   if (children instanceof Function) {
     const stream = participant ? participant.mediaStream : null;
     const participantName = participant ? participant.name || '' : '';
