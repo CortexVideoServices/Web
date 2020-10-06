@@ -4,7 +4,7 @@ interface Props extends HTMLProps<HTMLVideoElement> {
   stream?: MediaStream | null;
 }
 
-/// Stream context
+/// RemoteStream context
 export const StreamContext = React.createContext<MediaStream | null>(null);
 
 export function Video({ stream = null, ...props }: Props) {
@@ -13,6 +13,7 @@ export function Video({ stream = null, ...props }: Props) {
   React.useEffect(() => {
     if (videoElement.current) videoElement.current.srcObject = stream;
   });
+  console.log("== props", props)
   return <video ref={videoElement} {...props} autoPlay />;
 }
 

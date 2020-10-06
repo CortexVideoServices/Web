@@ -7,6 +7,7 @@ import { CVSError } from '../common';
 /// Janus implementation of the Publisher
 export class JanusPublisher extends Publisher {
   private handleId: number = 0;
+  private publishing: boolean = false;
   private janusConnection: JanusConnection | null = null;
 
   public constructor(settings: PublisherSettings, listener?: PublisherListener) {
@@ -19,14 +20,14 @@ export class JanusPublisher extends Publisher {
       throw new CVSError('Janus connection fail, cannot start publishing');
     this.janusConnection = janusConnection;
     this.handleId = await this.janusConnection.attache('janus.plugin.videoroom');
-    while (true) {
+    while (!this.publishing) {
       try {
         await this.janusConnection.sendRequest({
           janus: 'message',
           handle_id: this.handleId,
           body: { request: 'join', ptype: 'publisher', room: roomId },
         });
-        break;
+        this.publishing = true
       } catch (error) {
         if (error instanceof JanusError && error.code === 426) {
           await this.janusConnection.sendRequest({
@@ -56,6 +57,7 @@ export class JanusPublisher extends Publisher {
     } finally {
       this.handleId = 0;
       this.janusConnection = null;
+      this.publishing = false;
     }
   }
 

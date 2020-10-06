@@ -1,7 +1,7 @@
 import React, { HTMLProps, ReactNode } from 'react';
 import { SessionContext } from './Session';
 import { Participant } from '@cvss/classes';
-import Stream, { ParticipantContext } from './Stream';
+import RemoteStream, { ParticipantContext } from './RemoteStream';
 
 interface Props extends HTMLProps<HTMLVideoElement> {
   clone?: boolean;
@@ -31,7 +31,7 @@ export function Incoming({ clone = false, children, ...props }: Props) {
   return (
     <>
       {participantsToOut.map((participant, index) => {
-        children = children || (participant ? <Stream participant={participant} {...props} /> : <></>);
+        children = children || (participant ? <RemoteStream participant={participant} {...props} /> : <></>);
         return (
           <ParticipantContext.Provider value={participant} key={index}>
             {children}

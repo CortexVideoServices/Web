@@ -23,10 +23,10 @@ interface Props extends HTMLProps<HTMLVideoElement> {
 export const ParticipantContext = React.createContext<Participant | undefined>(undefined);
 
 /// Remote stream
-export function Stream({ participant, index, children, ...props }: Props) {
+export function RemoteStream({ participant, index, children, ...props }: Props) {
   if (!participant) participant = React.useContext(ParticipantContext) || undefined;
   if (!participant)
-    throw new Error('Stream component must be used with the participant or within the participant context.');
+    throw new Error('RemoteStream component must be used with the participant or within the participant context.');
   if (children instanceof Function) {
     const stream = participant ? participant.mediaStream : null;
     const participantName = participant ? participant.name || '' : '';
@@ -43,4 +43,4 @@ export function Stream({ participant, index, children, ...props }: Props) {
   } else return <Video key={index} stream={participant.mediaStream} {...props} />;
 }
 
-export default Stream;
+export default RemoteStream;

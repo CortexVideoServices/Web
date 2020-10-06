@@ -36,6 +36,7 @@ export function LocalStream({ children, ...props }: Props) {
   });
   const stream = participant ? participant.mediaStream : null;
   const participantName = participant ? participant.name || '' : '';
+  props.muted = true
   if (children) {
     if (children instanceof Function)
       return (
