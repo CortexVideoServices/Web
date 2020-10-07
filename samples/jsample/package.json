@@ -1,6 +1,6 @@
 {
   "name": "jsample",
-  "version": "0.1.0",
+  "version": "0.1.1-alpha.0",
   "main": "index.js",
   "author": "Alesh",
   "license": "MIT",
@@ -11,8 +11,8 @@
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
+    "@cvss/react": "^0.1.1-alpha.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "@cvss/react": "^0.1.0-alpha.0"
+    "react-dom": "^16.13.1"
   }
 }
