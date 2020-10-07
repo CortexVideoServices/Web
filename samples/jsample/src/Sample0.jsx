@@ -1,11 +1,14 @@
-import * as React from "react";
-import { Session, Publisher, Incoming } from "@cvss/react"
+import * as React from 'react';
+import { Session, Publisher, Incoming } from '@cvss/react';
+import './styles.css';
 
-export default function ({sessionId, serverUrl}) {
+export function Sample0({ sessionId, serverUrl }) {
   return (
-    <Session sessionId={sessionId || 'SAMPLE'} serverUrl={serverUrl}>
+    <Session sessionId={sessionId || 'SAMPLE0'} serverUrl={serverUrl}>
       <Publisher width={320} className="streamView" />
       <Incoming width={320} className="streamView" />
     </Session>
   );
 }
+
+export default Sample0;

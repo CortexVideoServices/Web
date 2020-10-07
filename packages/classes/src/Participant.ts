@@ -60,7 +60,7 @@ export abstract class AbcParticipant implements Participant {
 
   /// Enable/disable audio track or constrains
   get audio(): boolean | AudioConstraints | MediaTrackConstraints {
-    if (this._mediaStream instanceof MediaStream) {
+    if (this._mediaStream) {
       if (this._mediaStream.getAudioTracks().length > 0) {
         return this._mediaStream.getAudioTracks()[0].getConstraints();
       }
@@ -70,7 +70,7 @@ export abstract class AbcParticipant implements Participant {
 
   /// Enable/disable video track or constrains
   get video(): boolean | VideoConstraints | MediaTrackConstraints {
-    if (this._mediaStream instanceof MediaStream) {
+    if (this._mediaStream) {
       if (this._mediaStream.getVideoTracks().length > 0) return this._mediaStream.getVideoTracks()[0].getConstraints();
     }
     return false;
@@ -154,10 +154,10 @@ export abstract class AbcParticipant implements Participant {
 
   /// Creates and returns offer
   protected async createOffer(stream?: MediaStream): Promise<any> {
-    while (stream) {
-      if (this._mediaStream && this._mediaStream.id === stream.id) break;
-      await this.setLocalStream(stream);
-      break;
+    if (stream) {
+      if (!(this._mediaStream && this._mediaStream.id === stream.id)) {
+        await this.setLocalStream(stream);
+      }
     }
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach((track) => this.peerConnection.addTrack(track));

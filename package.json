@@ -2,13 +2,16 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "@types/react": "^16.9.43",
+    "@types/react": "^16.9.51",
     "@types/react-dom": "^16.9.8",
-    "lerna": "^3.15.0",
+    "lerna": "^3.22.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "tsdx": "^0.13.2",
-    "typescript": "^3.9.7"
+    "tsdx": "^0.14.0",
+    "typescript": "^4.0.3",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.1.2"
   },
   "workspaces": [
     "packages/*",
@@ -24,6 +27,19 @@
   "prettier": {
     "trailingComma": "es5",
     "singleQuote": true,
+    "printWidth": 120,
     "semi": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "prettier/@typescript-eslint",
+      "plugin:prettier/recommended"
+    ],
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    }
   }
 }

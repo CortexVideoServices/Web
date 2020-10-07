@@ -22,8 +22,8 @@ export class JanusConnection extends Connection {
     try {
       this.ws = new WebSocket(this.settings.serverUrl);
       this.ws.onmessage = (event) => this.onMessage(JSON.parse(event.data));
-      this.ws.onclose = (event) => {
-        if (!event.wasClean) this.emitError(new ConnectionError(event.reason));
+      this.ws.onclose = (_event) => {
+        //if (!event.wasClean) this.emitError(new ConnectionError(event.reason));
         this.onDisconnect();
       };
       this._state = ConnectionState.Connecting;

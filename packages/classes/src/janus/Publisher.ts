@@ -1,7 +1,6 @@
 import Publisher, { PublisherListener, PublisherSettings } from '../Publisher';
 import JanusConnection from './Connection';
 import { ConnectionState } from '../Connection';
-import { JanusError } from './common';
 import { CVSError } from '../common';
 
 /// Janus implementation of the Publisher
@@ -25,17 +24,17 @@ export class JanusPublisher extends Publisher {
         await this.janusConnection.sendRequest({
           janus: 'message',
           handle_id: this.handleId,
-          body: { request: 'join', ptype: 'publisher', room: roomId },
+          body: { request: 'join', ptype: 'publisher', room: roomId, display: this.name || 'Remote participant' },
         });
-        this.publishing = true
-      } catch (error) {
-        if (error instanceof JanusError && error.code === 426) {
+        this.publishing = true;
+      } catch (reason) {
+        if (reason && reason.code === 426) {
           await this.janusConnection.sendRequest({
             janus: 'message',
             handle_id: this.handleId,
             body: { request: 'create', room: roomId, is_private: true, publishers: 6 },
           });
-        } else this.emitError(error, true);
+        } else this.emitError(reason, true);
       }
     }
     const jsepLocal = await this.createOffer();

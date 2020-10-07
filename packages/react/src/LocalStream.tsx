@@ -37,7 +37,7 @@ export function LocalStream({ children, ...props }: Props) {
   const stream = participant ? participant.mediaStream : null;
   const participantName = participant ? participant.name || '' : '';
   if (children) {
-    if (children instanceof Function)
+    if (typeof children === 'function')
       return (
         <>
           {children({

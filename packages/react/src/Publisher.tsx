@@ -32,8 +32,8 @@ export function Publisher({
   if (!session) throw new Error('Publisher component must be used within the classes context.');
   const publisherBuilder = new PublisherBuilder(session, participantName, audio, video);
   if (participantName) publisherBuilder.participantName = participantName;
-  if (publisherBuilder.audio instanceof Boolean) publisherBuilder.audio = audio;
-  if (publisherBuilder.video instanceof Boolean) publisherBuilder.video = video;
+  if (typeof publisherBuilder.audio === 'boolean') publisherBuilder.audio = audio;
+  if (typeof publisherBuilder.video === 'boolean') publisherBuilder.video = video;
   const publisher = publisherBuilder.build(eventHandlers, autoPublishing);
   React.useEffect(() => {
     publisher.startCapturer().catch(console.error);

@@ -12,7 +12,7 @@ interface Props extends HTMLProps<HTMLVideoElement> {
 export const ParticipantsContext = React.createContext<Array<Participant>>([]);
 
 /// Remote stream receiver
-export function Incoming({ clone = false, children, ...props }: Props) {
+export function Incoming({ clone = true, children, ...props }: Props) {
   const session = React.useContext(SessionContext);
   if (!session) throw new Error('Incoming component must be used within the classes context.');
   const [participants, setParticipants] = React.useState<Array<Participant>>(session.remoteStreams);

@@ -1,7 +1,7 @@
-import * as React from "react";
-import { Session, Publisher, Incoming } from "@cvss/react"
-import { SessionListener, PublisherListener } from "@cvss/classes";
-
+import * as React from 'react';
+import { Session, Publisher, Incoming } from '@cvss/react';
+import { SessionListener, PublisherListener } from '@cvss/classes';
+import './styles.css';
 
 interface Props {
   sessionId?: string;
@@ -10,11 +10,13 @@ interface Props {
   publisherListener?: PublisherListener;
 }
 
-export default function ({sessionId, serverUrl}: Props) {
+export function Sample0({ sessionId, serverUrl }: Props) {
   return (
-    <Session sessionId={sessionId || 'SAMPLE'} serverUrl={serverUrl}>
+    <Session sessionId={sessionId || 'SAMPLE0'} serverUrl={serverUrl}>
       <Publisher width={320} className="streamView" />
       <Incoming width={320} className="streamView" />
     </Session>
   );
 }
+
+export default Sample0;

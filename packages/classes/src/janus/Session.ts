@@ -1,6 +1,6 @@
 import Session, { SessionListener, SessionSettings } from '../Session';
 import Connection, { ConnectionState } from '../Connection';
-//import { ParticipantSettings } from '../Participant';
+import { ParticipantSettings } from '../Participant';
 import { FeedData, Message } from './common';
 import { CVSError } from '../common';
 import JanusConnection from './Connection';
@@ -59,7 +59,11 @@ export class JanusSession extends Session {
       if (!data.private_id) this.privateId = data.private_id;
       data.publishers.forEach((feed: FeedData) => {
         if (feed.id && !this.remoteFeeds.has(feed.id)) {
-          const remoteParticipant = new RemoteParticipant(this.settings, {
+          const settings: ParticipantSettings = {
+            ...this.settings,
+            participantName: feed.display || 'Remote participant',
+          };
+          const remoteParticipant = new RemoteParticipant(settings, {
             onError: (reason) => this.emitError(reason),
             onStreamCreated: (participant) => this.emitStreamReceived(participant),
             onStreamDestroy: (participant) => this.emitStreamDropped(participant),

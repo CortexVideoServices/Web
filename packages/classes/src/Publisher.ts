@@ -120,7 +120,7 @@ export abstract class Publisher extends AbcParticipant {
   /// Switches camera
   async switchCamera(deviceId?: string | VideoConstraints): Promise<MediaStream | null> {
     try {
-      if (deviceId instanceof VideoConstraints) {
+      if (typeof deviceId === 'object') {
         await this.startCapturer(deviceId);
       } else {
         if (!deviceId && this.mediaStream && this.camDevices.size && this.mediaStream.getVideoTracks().length) {
@@ -134,7 +134,7 @@ export abstract class Publisher extends AbcParticipant {
           }
         }
         if (deviceId) {
-          if (this.video instanceof VideoConstraints)
+          if (typeof this.video === 'object')
             this.setVideo(new VideoConstraints(deviceId, this.video.resolution, this.video.fps, this.video.wide));
           else this.setVideo(new VideoConstraints(deviceId));
           await this.startCapturer();

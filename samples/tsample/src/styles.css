@@ -1,0 +1,40 @@
+.App {
+    margin: 0 auto;
+    max-width: 1050px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.streamBox {
+    margin: 13px 2px 2px 2px;
+    padding: 13px 2px 2px 2px;
+    border: 3px double gray;
+}
+
+.streamControl {
+    display: block;
+    position: absolute;
+    margin-top: -25px;
+}
+
+.streamControl > div {
+    padding: 0 10px;
+    margin: 0;
+    position: relative;
+    background: silver;
+}
+
+.streamControl > div > div {
+    display: inline-block;
+}
+
+.streamControl > div > div > img {
+    vertical-align: text-top;
+    margin-left: 4px;
+}
+
+.streamView {
+    display: block;
+    width: 320px;
+    height: 240px;
+}
