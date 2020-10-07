@@ -4,7 +4,11 @@ README.md
 node_modules
 build
 *.log*
+dist
+.DS_Store
+.cache
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
