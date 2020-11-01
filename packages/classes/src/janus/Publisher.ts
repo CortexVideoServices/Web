@@ -14,7 +14,7 @@ export class JanusPublisher extends Publisher {
   }
 
   /// Starts publishing
-  async startPublishing(janusConnection: JanusConnection, roomId: number): Promise<void> {
+  async startPublishing(janusConnection: JanusConnection, conferenceSessionId: string): Promise<void> {
     if (janusConnection.state !== ConnectionState.Connected)
       throw new CVSError('Janus connection fail, cannot start publishing');
     this.janusConnection = janusConnection;
@@ -24,7 +24,12 @@ export class JanusPublisher extends Publisher {
         await this.janusConnection.sendRequest({
           janus: 'message',
           handle_id: this.handleId,
-          body: { request: 'join', ptype: 'publisher', room: roomId, display: this.name || 'Remote participant' },
+          body: {
+            request: 'join',
+            ptype: 'publisher',
+            conferenceSessionId: conferenceSessionId,
+            display: this.name || 'Remote participant',
+          },
         });
         this.publishing = true;
       } catch (reason) {
@@ -32,7 +37,7 @@ export class JanusPublisher extends Publisher {
           await this.janusConnection.sendRequest({
             janus: 'message',
             handle_id: this.handleId,
-            body: { request: 'create', room: roomId, is_private: true, publishers: 6 },
+            body: { request: 'create', conferenceSessionId: conferenceSessionId, is_private: true, publishers: 6 },
           });
         } else this.emitError(reason, true);
       }

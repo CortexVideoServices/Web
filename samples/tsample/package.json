@@ -12,13 +12,13 @@
     "@cvss/react": "./src/packages/react"
   },
   "devDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
     "@types/react": "^16.9.51",
     "@types/react-dom": "^16.9.8",
+    "@types/react-router-dom": "^5.1.6",
     "parcel-bundler": "^1.12.4",
     "typescript": "^4.0.3"
-  },
-  "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
   }
 }

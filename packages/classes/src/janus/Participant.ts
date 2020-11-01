@@ -17,7 +17,7 @@ export class JanusParticipant extends Participant {
   /// Starts subscribing
   async startSubscribing(
     janusConnection: JanusConnection,
-    roomId: number,
+    conferenceSessionId: string,
     feed: FeedData,
     privateId: number
   ): Promise<void> {
@@ -28,14 +28,20 @@ export class JanusParticipant extends Participant {
     const [, remoteJSep] = await this.janusConnection.sendRequest({
       janus: 'message',
       handle_id: this.handleId,
-      body: { request: 'join', ptype: 'subscriber', room: roomId, feed: feed.id, private_id: privateId },
+      body: {
+        request: 'join',
+        ptype: 'subscriber',
+        conferenceSessionId: conferenceSessionId,
+        feed: feed.id,
+        private_id: privateId,
+      },
     });
     await this.applyRemoteDescription(remoteJSep);
     const localJSep = await this.createAnswer();
     await this.janusConnection.sendRequest({
       janus: 'message',
       handle_id: this.handleId,
-      body: { request: 'start', room: roomId },
+      body: { request: 'start', conferenceSessionId: conferenceSessionId },
       jsep: localJSep,
     });
     await this.peerConnected();

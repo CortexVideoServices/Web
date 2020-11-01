@@ -10,7 +10,6 @@ import RemoteParticipant from './Participant';
 /// Janus implementation on classes
 export class JanusSession extends Session {
   private privateId = 0;
-  private roomId = parseInt(this.settings.sessionId, 36);
   private janusConnection: JanusConnection;
   //private participantSettings: ParticipantSettings;
   private remoteFeeds = new Map<number, RemoteParticipant>();
@@ -38,7 +37,7 @@ export class JanusSession extends Session {
   }
 
   protected async startPublishing(publisher: JanusPublisher): Promise<void> {
-    await publisher.startPublishing(this.janusConnection, this.roomId);
+    await publisher.startPublishing(this.janusConnection, this.settings.sessionId);
     this.emitPublishingStarted(publisher);
   }
 
@@ -68,7 +67,7 @@ export class JanusSession extends Session {
             onStreamCreated: (participant) => this.emitStreamReceived(participant),
             onStreamDestroy: (participant) => this.emitStreamDropped(participant),
           });
-          remoteParticipant.startSubscribing(this.janusConnection, this.roomId, feed, this.privateId).then(() => {
+          remoteParticipant.startSubscribing(this.janusConnection, this.settings.sessionId, feed, this.privateId).then(() => {
             this.remoteFeeds.set(feed.id, remoteParticipant);
           });
         }

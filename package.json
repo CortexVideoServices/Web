@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "lerna": "lerna",
-    "start": "lerna run start --stream --parallel",
+    "watch": "lerna run watch --stream --parallel",
     "test": "lerna run test --",
     "build": "lerna run build",
     "prepublish": "lerna run prepublish"
