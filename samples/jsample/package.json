@@ -1,7 +1,7 @@
 {
   "name": "jsample",
   "private": true,
-  "version": "0.1.1-alpha.0",
+  "version": "0.1.2-alpha.0",
   "main": "index.js",
   "author": "Alesh",
   "license": "MIT",
@@ -9,10 +9,10 @@
     "start": "parcel src/index.html --open"
   },
   "devDependencies": {
-    "@cvss/react": "^0.1.1-alpha.0",
+    "@cvss/react": "^0.1.2-alpha.0",
+    "parcel-bundler": "^1.12.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "parcel-bundler": "^1.12.4",
     "react-router-dom": "^5.2.0"
   }
 }

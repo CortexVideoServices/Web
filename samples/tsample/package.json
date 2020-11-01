@@ -1,7 +1,7 @@
 {
   "name": "tsample",
   "private": true,
-  "version": "0.1.1-alpha.0",
+  "version": "0.1.2-alpha.0",
   "main": "index.js",
   "author": "Alesh",
   "license": "MIT",
@@ -13,13 +13,13 @@
     "@cvss/react": "./src/packages/react"
   },
   "devDependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-router-dom": "^5.2.0",
     "@types/react": "^16.9.51",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.6",
     "parcel-bundler": "^1.12.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
     "typescript": "^4.0.3"
   }
 }
