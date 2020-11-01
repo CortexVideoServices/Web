@@ -1,6 +1,7 @@
 import Connection, { ConnectionSettings, ConnectionListener, ConnectionState } from './Connection';
 import { Participant, ParticipantListener } from './Participant';
 import Publisher from './Publisher';
+import 'webrtc-adapter';
 
 /// Session settings
 export interface SessionSettings extends ConnectionSettings {
