@@ -21,8 +21,12 @@ Key Features
 Get started
 -----------
 This is ready to develop a web application with [React framework], just install the 
-`yarn add @cvss/response` package in your project. [@cvss/react] - There is documentation 
-and examples of using the components.
+`@cvss/react` package with our components into your project:
+    
+    yarn add @cvss/react
+
+Please follow to [@cvss/react], there is documentation 
+and examples how to using thoes components.
 
 [Cortex Video Services]: http://cvs.solutions
 [Cortex Technology]: http://cb.technology/
