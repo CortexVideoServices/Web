@@ -1,16 +1,15 @@
 Cortex Video Services Web SDK
 =============================
-This repository contains packages and samples. In together, this is 
-the Cortex Video Services Web SDK, which helps you develop web applications 
-that enable video calling and video conferencing. This software is developing 
-and maintained with the support and assistance of [Cortex Technology].
+This is Cortex Video Services Web SDK, which helps you develop web applications 
+that enables video calling and video conferencing. This software is developed 
+and maintained by [Cortex Technology].
 
 Key Features
 ------------
-* This works with the [Cortex Video Services] what is opensource platform  
+* The SDK works with the [Cortex Video Services] what is opensource platform  
   based on WebRTC technology. 
-* Allows your application to implement both regular video calls and group 
-  (video conferencing) calls.
+* compatable for end to end and group video calls  
+  (video conferencing) .
 * Contains a set of components for the [React framework] to implement the full 
   functionality of video calls in web applications written in **javascript** 
   and **typescript**
